@@ -14,10 +14,15 @@ public enum ErrorCode {
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
 
     //permisson
-    PERMISSION_EXSITED(1007, "permission existed", HttpStatus.BAD_REQUEST),
-    PERMISSION_NOT_EXSITED(1011, "permission not existed", HttpStatus.BAD_REQUEST),
-    PERMISSION_NAME_REQUEST(1009, "Name is not null", HttpStatus.BAD_REQUEST),
-    PERMISSION_STATUS_REQUEST(1010, "Status is not null", HttpStatus.BAD_REQUEST)
+    PERMISSION_EXSITED(1007, "Permission đã tồn tại", HttpStatus.BAD_REQUEST),
+    PERMISSION_NOT_EXSITED(1011, "Permission không tồn tại", HttpStatus.BAD_REQUEST),
+    PERMISSION_NAME_MAX_LENGTH(1012, "Trường name tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
+    PERMISSION_NAME_REQUEST(1009, "Trường name không được để trống", HttpStatus.BAD_REQUEST),
+    PERMISSION_DESCRIPTION_MAX_LENGTH(1013, "Trường description tối đa 255 kí tự", HttpStatus.BAD_REQUEST),
+    PERMISSION_STATUS_REQUEST(1010, "Trường status không được để trống", HttpStatus.BAD_REQUEST),
+    PERMISSION_INVALID(1013, "Giá trị không hợp lệ", HttpStatus.BAD_REQUEST),
+    PERMISSION_NOT_READ_FILE(1014, "Không thể đọc file Excel", HttpStatus.BAD_REQUEST),
+    PERMISSION_ERROR_FILE(1015, "Dữ liệu không đúng", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

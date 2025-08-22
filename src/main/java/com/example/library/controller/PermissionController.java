@@ -7,11 +7,18 @@ import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.Permission.PermissionListResponse;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.entity.Permission;
+import com.example.library.repository.PermissionRepository;
 import com.example.library.service.PermissionService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/permissions")
@@ -20,6 +27,8 @@ public class PermissionController {
     private PermissionService permissionService;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     @PostMapping
     public ApiResponse<PermissionResponse> create(@Valid @RequestBody PermissionCreateRequest request) {
@@ -30,24 +39,45 @@ public class PermissionController {
         return apiResponse;
     }
 
+    @PostMapping("/import")
+    public ApiResponse<?> importPermissions(@RequestParam("file") MultipartFile file) {
+        permissionService.importFromExcel(file);
+        ApiResponse<?> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thành công");
+        return apiResponse;
+    }
+
+    @PostMapping("/export")
+    public void exportPermissions(@RequestBody PermissionListRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "permissions_list.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        permissionService.exportToExcel(request, response);
+    }
+
+    @PostMapping("/template-file")
+    public void exportTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "template_permissions.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        permissionService.exportTemplateExcel(response);
+    }
+
     @GetMapping
     public ApiResponse<PermissionListResponse> getList(
-            @RequestParam(value = "name") String name,
-            @RequestParam(value = "status") Integer status,
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "sortBy") String sortBy,
-            @RequestParam(value = "sortType") String sortType
+            @Valid @ModelAttribute PermissionListRequest request
     ){
-        PermissionListRequest request = new PermissionListRequest();
-        request.setName(name);
-        request.setStatus(status);
-        request.setPage(page);
-        request.setSize(size);
-        request.setSortBy(sortBy);
-        request.setSortType(sortType);
         PermissionListResponse response = permissionService.getList(request);
         ApiResponse<PermissionListResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(response);
+        return apiResponse;
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<PermissionResponse> getDetail(@PathVariable("id") Long id) {
+        ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
+        Permission permission = permissionService.detail(id);
+        PermissionResponse response = modelMapper.map(permission, PermissionResponse.class);
         apiResponse.setResult(response);
         return apiResponse;
     }
@@ -61,11 +91,12 @@ public class PermissionController {
         return apiResponse;
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> delete(@PathVariable("id") Long id){
-        permissionService.delete(id);
+    @PostMapping("/delete")
+    public ApiResponse<String> delete(@RequestBody Map<String, List<Long>> request) {
+        List<Long> ids = request.get("list");
+        permissionService.delete(ids);
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult("Delete permission successfull!");
+        apiResponse.setResult("Delete permissions successful!");
         return apiResponse;
     }
 }

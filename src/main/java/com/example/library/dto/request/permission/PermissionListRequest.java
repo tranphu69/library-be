@@ -1,11 +1,22 @@
 package com.example.library.dto.request.permission;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 public class PermissionListRequest {
+    @Size(max = 50, message = "PERMISSION_NAME_MAX_LENGTH")
     private String name;
+    @Min(value = 0, message = "PERMISSION_INVALID")
+    @Max(value = 1, message = "PERMISSION_INVALID")
     private Integer status;
+    @Min(value = 0, message = "PERMISSION_INVALID")
     private Integer page;
+    @Min(value = 1, message = "PERMISSION_INVALID")
     private Integer size;
     private String sortBy;
+    @Pattern(regexp = "^(ASC|DESC)$", message = "PERMISSION_INVALID")
     private String sortType;
 
     public String getName() {
