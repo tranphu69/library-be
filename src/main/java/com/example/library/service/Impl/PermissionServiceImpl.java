@@ -15,6 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +178,17 @@ public class PermissionServiceImpl implements PermissionService {
         sheet.setColumnWidth(0, 8000);
         sheet.setColumnWidth(1, 12000);
         sheet.setColumnWidth(2, 10000);
+        DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+        DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(
+                new String[]{"Hoạt động", "Không hoạt động"}
+        );
+        CellRangeAddressList addressList = new CellRangeAddressList(4, permissionResponses.toArray().length + 3, 2, 2);
+        DataValidation validation = validationHelper.createValidation(constraint, addressList);
+        if (validation instanceof org.apache.poi.xssf.usermodel.XSSFDataValidation) {
+            validation.setSuppressDropDownArrow(true);
+            validation.setShowErrorBox(true);
+        }
+        sheet.addValidationData(validation);
         workbook.write(response.getOutputStream());
         workbook.close();
     }
@@ -376,6 +388,17 @@ public class PermissionServiceImpl implements PermissionService {
         sheet.setColumnWidth(0, 8000);
         sheet.setColumnWidth(1, 12000);
         sheet.setColumnWidth(2, 10000);
+        DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+        DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(
+                new String[]{"Hoạt động", "Không hoạt động"}
+        );
+        CellRangeAddressList addressList = new CellRangeAddressList(4, 15, 2, 2);
+        DataValidation validation = validationHelper.createValidation(constraint, addressList);
+        if (validation instanceof org.apache.poi.xssf.usermodel.XSSFDataValidation) {
+            validation.setSuppressDropDownArrow(true);
+            validation.setShowErrorBox(true);
+        }
+        sheet.addValidationData(validation);
         workbook.write(response.getOutputStream());
         workbook.close();
     }
