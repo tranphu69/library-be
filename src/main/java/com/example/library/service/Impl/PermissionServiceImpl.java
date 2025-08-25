@@ -15,6 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -93,19 +94,19 @@ public class PermissionServiceImpl implements PermissionService {
         List<PermissionResponse> permissionResponses = getListPermission(request, permissionPage);
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Thông tin danh sách");
-        //style title
         CellStyle titleStyle = workbook.createCellStyle();
         Font titleFont = workbook.createFont();
         titleFont.setBold(true);
         titleFont.setFontHeightInPoints((short) 14);
         titleStyle.setFont(titleFont);
         titleStyle.setAlignment(HorizontalAlignment.CENTER);
+        titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         Row titleRow = sheet.createRow(1);
+        titleRow.setHeightInPoints(30);
         Cell titleCell = titleRow.createCell(0);
         titleCell.setCellValue("DANH SÁCH PERMISSION");
         titleCell.setCellStyle(titleStyle);
         sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
-        //style cho header
         CellStyle headerStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
@@ -118,16 +119,51 @@ public class PermissionServiceImpl implements PermissionService {
         headerStyle.setBorderTop(BorderStyle.THIN);
         headerStyle.setBorderLeft(BorderStyle.THIN);
         headerStyle.setBorderRight(BorderStyle.THIN);
-        //tao ham header
+        headerStyle.setWrapText(true);
         Row headerRow = sheet.createRow(3);
-        headerRow.setHeightInPoints(30);
-        String[] headers = {"Tên", "Mô tả", "Trạng thái"};
+        headerRow.setHeightInPoints(60);
+        String[] headers = {"Tên * \n(Tối đa 50 kí tự)", "Mô tả \n(Tối đa 255 kí tự)", "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
+            XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
+            Font fontTitle = workbook.createFont();
+            Font fontStar = workbook.createFont();
+            Font fontDesc = workbook.createFont();
+            switch (i) {
+                case 0:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 3, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(3, 5, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 1:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 5, fontTitle);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 2:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 10, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(10, 12, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(13, headers[i].length(), fontDesc);
+                    break;
+            }
+            cell.setCellValue(richText);
             cell.setCellStyle(headerStyle);
         }
-        //fill du lieu
         int rowIndex = 4;
         for (PermissionResponse p : permissionResponses) {
             Row row = sheet.createRow(rowIndex++);
@@ -135,14 +171,12 @@ public class PermissionServiceImpl implements PermissionService {
             row.createCell(1).setCellValue(p.getDescription());
             row.createCell(2).setCellValue(p.getStatus() == 1 ? "Hoạt động" : "Không hoạt động");
         }
-        //auto resize cot
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
         }
         sheet.setColumnWidth(0, 8000);
         sheet.setColumnWidth(1, 12000);
-        sheet.setColumnWidth(2, 6000);
-        //ghi file ra response
+        sheet.setColumnWidth(2, 10000);
         workbook.write(response.getOutputStream());
         workbook.close();
     }
@@ -187,7 +221,6 @@ public class PermissionServiceImpl implements PermissionService {
             Sheet sheet = workbook.getSheetAt(0);
             Set<String> excelNames = new HashSet<>();
             List<Permission> permissions = new ArrayList<>();
-
             for(int i = 4; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if(isRowEmpty(row)) continue;
@@ -267,19 +300,19 @@ public class PermissionServiceImpl implements PermissionService {
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Thông tin danh sách");
-        //style title
         CellStyle titleStyle = workbook.createCellStyle();
         Font titleFont = workbook.createFont();
         titleFont.setBold(true);
         titleFont.setFontHeightInPoints((short) 14);
         titleStyle.setFont(titleFont);
         titleStyle.setAlignment(HorizontalAlignment.CENTER);
+        titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         Row titleRow = sheet.createRow(1);
+        titleRow.setHeightInPoints(30);
         Cell titleCell = titleRow.createCell(0);
         titleCell.setCellValue("DANH SÁCH PERMISSION");
         titleCell.setCellStyle(titleStyle);
         sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
-        //style cho header
         CellStyle headerStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
@@ -292,23 +325,57 @@ public class PermissionServiceImpl implements PermissionService {
         headerStyle.setBorderTop(BorderStyle.THIN);
         headerStyle.setBorderLeft(BorderStyle.THIN);
         headerStyle.setBorderRight(BorderStyle.THIN);
-        //tao ham header
+        headerStyle.setWrapText(true);
         Row headerRow = sheet.createRow(3);
-        headerRow.setHeightInPoints(30);
-        String[] headers = {"Tên", "Mô tả", "Trạng thái"};
+        headerRow.setHeightInPoints(60);
+        String[] headers = {"Tên * \n(Tối đa 50 kí tự)", "Mô tả \n(Tối đa 255 kí tự)", "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
+            XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
+            Font fontTitle = workbook.createFont();
+            Font fontStar = workbook.createFont();
+            Font fontDesc = workbook.createFont();
+            switch (i) {
+                case 0:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 3, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(3, 5, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 1:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 5, fontTitle);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 2:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 10, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(10, 12, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(13, headers[i].length(), fontDesc);
+                    break;
+            }
+            cell.setCellValue(richText);
             cell.setCellStyle(headerStyle);
         }
-        //auto resize cot
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
         }
         sheet.setColumnWidth(0, 8000);
         sheet.setColumnWidth(1, 12000);
-        sheet.setColumnWidth(2, 6000);
-        //ghi file ra response
+        sheet.setColumnWidth(2, 10000);
         workbook.write(response.getOutputStream());
         workbook.close();
     }
