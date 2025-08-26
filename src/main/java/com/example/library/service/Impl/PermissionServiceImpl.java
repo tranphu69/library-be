@@ -84,6 +84,23 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public List<PermissionResponse> getListAutoSearch(String keyword) {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Permission> permissionPage = permissionRepository.search(keyword, pageable);
+        return permissionPage.getContent()
+                .stream()
+                .map(permission -> {
+                    PermissionResponse response = new PermissionResponse();
+                    response.setId(permission.getId());
+                    response.setName(permission.getName());
+                    response.setDescription(permission.getDescription());
+                    response.setStatus(permission.getStatus());
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void exportToExcel(PermissionListRequest request, HttpServletResponse response) throws IOException {
         Sort sort = createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);

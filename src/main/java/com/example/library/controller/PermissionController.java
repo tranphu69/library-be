@@ -73,6 +73,14 @@ public class PermissionController {
         return apiResponse;
     }
 
+    @GetMapping("/auto-search")
+    public ApiResponse<List<PermissionResponse>> getListAutoSearch(@RequestParam String keyword){
+        List<PermissionResponse> response = permissionService.getListAutoSearch(keyword);
+        ApiResponse<List<PermissionResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(response);
+        return apiResponse;
+    }
+
     @GetMapping("/{id}")
     public ApiResponse<PermissionResponse> getDetail(@PathVariable("id") Long id) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();

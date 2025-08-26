@@ -4,6 +4,7 @@ import com.example.library.dto.request.permission.PermissionCreateRequest;
 import com.example.library.dto.request.permission.PermissionListRequest;
 import com.example.library.dto.request.permission.PermissionUpdateRequest;
 import com.example.library.dto.response.Permission.PermissionListResponse;
+import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.entity.Permission;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ public interface PermissionService {
     Permission create(PermissionCreateRequest request);
     Permission update(PermissionUpdateRequest request);
     PermissionListResponse getList(PermissionListRequest request);
+    List<PermissionResponse> getListAutoSearch(String keyword);
     void importFromExcel(MultipartFile file);
     void delete (List<Long> id);
     Permission detail(Long id);

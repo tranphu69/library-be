@@ -21,4 +21,10 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             @Param("status") Integer status,
             Pageable pageable
     );
+
+    @Query("SELECT p FROM Permission p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Permission> search(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 }
