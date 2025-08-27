@@ -1,9 +1,10 @@
-package com.example.library.dto.request.permission;
+package com.example.library.dto.request.role;
 
 import jakarta.validation.constraints.*;
 
-public class PermissionUpdateRequest {
-    private Long id;
+import java.util.List;
+
+public class RoleCreateRequest {
     @NotBlank(message = "NAME_REQUEST")
     @Size(max = 50, message = "NAME_MAX_LENGTH")
     private String name;
@@ -13,22 +14,8 @@ public class PermissionUpdateRequest {
     @Min(value = 0, message = "INVALID")
     @Max(value = 1, message = "INVALID")
     private Integer status;
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @NotEmpty(message = "PERMISSIONS_REQUEST")
+    private List<Long> permissions;
 
     public String getName() {
         return name;
@@ -44,5 +31,21 @@ public class PermissionUpdateRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public List<Long> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Long> permissions) {
+        this.permissions = permissions;
     }
 }

@@ -1,17 +1,23 @@
-package com.example.library.dto.request.permission;
+package com.example.library.dto.response.role;
 
-import jakarta.validation.constraints.*;
+import com.example.library.entity.Permission;
 
-public class PermissionCreateRequest {
-    @NotBlank(message = "NAME_REQUEST")
-    @Size(max = 50, message = "NAME_MAX_LENGTH")
+import java.util.Set;
+
+public class RoleResponse {
+    private Long id;
     private String name;
-    @Size(max = 255, message = "DESCRIPTION_MAX_LENGTH")
     private String description;
-    @NotNull(message = "STATUS_REQUEST")
-    @Min(value = 0, message = "INVALID")
-    @Max(value = 1, message = "INVALID")
     private Integer status;
+    private Set<Permission> permissions;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -35,5 +41,13 @@ public class PermissionCreateRequest {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
     }
 }

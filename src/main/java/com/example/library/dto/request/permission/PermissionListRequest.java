@@ -6,17 +6,17 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class PermissionListRequest {
-    @Size(max = 50, message = "PERMISSION_NAME_MAX_LENGTH")
+    @Size(max = 50, message = "NAME_MAX_LENGTH")
     private String name;
-    @Min(value = 0, message = "PERMISSION_INVALID")
-    @Max(value = 1, message = "PERMISSION_INVALID")
+    @Min(value = 0, message = "INVALID")
+    @Max(value = 1, message = "INVALID")
     private Integer status;
-    @Min(value = 0, message = "PERMISSION_INVALID")
+    @Min(value = 0, message = "INVALID")
     private Integer page;
-    @Min(value = 1, message = "PERMISSION_INVALID")
+    @Min(value = 1, message = "INVALID")
     private Integer size;
     private String sortBy;
-    @Pattern(regexp = "^(ASC|DESC)$", message = "PERMISSION_INVALID")
+    @Pattern(regexp = "^(ASC|DESC)$", message = "INVALID")
     private String sortType;
 
     public String getName() {

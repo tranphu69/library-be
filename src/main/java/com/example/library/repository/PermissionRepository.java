@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
     boolean existsByName(String name);
     boolean existsById(Long id);
+    List<Permission> findAllByIdIn(List<Long> ids);
 
     @Query("SELECT p FROM Permission p WHERE " +
             "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +

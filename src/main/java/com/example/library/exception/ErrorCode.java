@@ -12,17 +12,22 @@ public enum ErrorCode {
     UNAUTHENTICATED(1005, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1006, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+    NAME_MAX_LENGTH(1012, "Trường name tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
+    NAME_REQUEST(1009, "Trường name không được để trống", HttpStatus.BAD_REQUEST),
+    DESCRIPTION_MAX_LENGTH(1013, "Trường description tối đa 255 kí tự", HttpStatus.BAD_REQUEST),
+    STATUS_REQUEST(1010, "Trường status không được để trống", HttpStatus.BAD_REQUEST),
+    INVALID(1013, "Giá trị không hợp lệ", HttpStatus.BAD_REQUEST),
 
     //permisson
     PERMISSION_EXSITED(1007, "Permission đã tồn tại", HttpStatus.BAD_REQUEST),
     PERMISSION_NOT_EXSITED(1011, "Permission không tồn tại", HttpStatus.BAD_REQUEST),
-    PERMISSION_NAME_MAX_LENGTH(1012, "Trường name tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
-    PERMISSION_NAME_REQUEST(1009, "Trường name không được để trống", HttpStatus.BAD_REQUEST),
-    PERMISSION_DESCRIPTION_MAX_LENGTH(1013, "Trường description tối đa 255 kí tự", HttpStatus.BAD_REQUEST),
-    PERMISSION_STATUS_REQUEST(1010, "Trường status không được để trống", HttpStatus.BAD_REQUEST),
-    PERMISSION_INVALID(1013, "Giá trị không hợp lệ", HttpStatus.BAD_REQUEST),
     PERMISSION_NOT_READ_FILE(1014, "Không thể đọc file Excel", HttpStatus.BAD_REQUEST),
-    PERMISSION_ERROR_FILE(1015, "Dữ liệu không đúng", HttpStatus.BAD_REQUEST)
+    PERMISSION_ERROR_FILE(1015, "Dữ liệu không đúng", HttpStatus.BAD_REQUEST),
+
+    //role
+    ROLE_EXSITED(1017, "Role đã tồn tại", HttpStatus.BAD_REQUEST),
+    PERMISSIONS_REQUEST(1016, "Phải chọn ít nhất một Permission", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXSITED(1018, "Role không tồn tại", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;
