@@ -321,8 +321,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Permission detail(Long id) {
-        return permissionRepository.findById(id)
+        Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXSITED));
+        if (permission.getStatus() == -1) {
+            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+        }
+        return permission;
     }
 
     @Override

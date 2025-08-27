@@ -2,9 +2,15 @@ package com.example.library.service;
 
 import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.role.RoleUpdateRequest;
+import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.entity.Role;
+
+import java.util.List;
 
 public interface RoleService {
     Role create(RoleCreateRequest request);
     Role update(RoleUpdateRequest request);
+    void delete (List<Long> ids);
+    Role detail(Long id);
+    List<RoleResponse> getListAutoSearch(String keyword);
 }
