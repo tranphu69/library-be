@@ -30,10 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,12 +44,18 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role create(RoleCreateRequest request) {
+        if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
+            throw new AppException(ErrorCode.ROLE_STATUS_1);
+        }
         if(roleRepository.existsByName(request.getName())) {
             throw new AppException(ErrorCode.ROLE_EXSITED);
         }
-        List<Permission> permissions = permissionRepository.findAllActiveById(request.getPermissions());
-        if (permissions.size() != request.getPermissions().size()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+        List<Permission> permissions = new ArrayList<>();
+        if (!request.getPermissions().isEmpty()) {
+            permissions = permissionRepository.findAllActiveById(request.getPermissions());
+            if (permissions.size() != request.getPermissions().size()) {
+                throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            }
         }
         Role role = new Role();
         role.setName(request.getName());
@@ -66,9 +69,15 @@ public class RoleServiceImpl implements RoleService {
     public Role update(RoleUpdateRequest request) {
         Role role = roleRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXSITED));
-        List<Permission> permissions = permissionRepository.findAllActiveById(request.getPermissions());
-        if (permissions.size() != request.getPermissions().size()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+        if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
+            throw new AppException(ErrorCode.ROLE_STATUS_1);
+        }
+        List<Permission> permissions = new ArrayList<>();
+        if (!request.getPermissions().isEmpty()) {
+            permissions = permissionRepository.findAllActiveById(request.getPermissions());
+            if (permissions.size() != request.getPermissions().size()) {
+                throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            }
         }
         role.setName(request.getName());
         role.setDescription(request.getDescription());

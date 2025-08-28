@@ -16,7 +16,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     boolean existsById(Long id);
     List<Permission> findAllByIdIn(List<Long> ids);
 
-    @Query("SELECT p FROM Permission p WHERE " +
+    @Query("SELECT p FROM Permission p WHERE p.status <> -1 AND " +
             "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
             "(:status IS NULL OR p.status = :status)")
     Page<Permission> findPermissionsWithFilters(
@@ -28,7 +28,11 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     @Query("SELECT p FROM Permission p WHERE p.id IN :ids AND p.status <> -1")
     List<Permission> findAllActiveById(@Param("ids") List<Long> ids);
 
-    @Query("SELECT p FROM Permission p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @Query("""
+            SELECT p FROM Permission p 
+            WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            AND p.status <> -1
+""")
     Page<Permission> search(
             @Param("keyword") String keyword,
             Pageable pageable

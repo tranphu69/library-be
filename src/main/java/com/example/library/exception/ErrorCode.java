@@ -28,6 +28,7 @@ public enum ErrorCode {
     ROLE_EXSITED(1017, "Role đã tồn tại", HttpStatus.BAD_REQUEST),
     PERMISSIONS_REQUEST(1016, "Phải chọn ít nhất một Permission", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXSITED(1018, "Role không tồn tại", HttpStatus.BAD_REQUEST),
+    ROLE_STATUS_1(1019, "Với trạng thái hoạt động cần ít nhất một permission", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

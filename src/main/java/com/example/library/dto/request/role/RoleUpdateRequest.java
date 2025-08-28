@@ -15,7 +15,6 @@ public class RoleUpdateRequest {
     @Min(value = 0, message = "INVALID")
     @Max(value = 1, message = "INVALID")
     private Integer status;
-    @NotEmpty(message = "PERMISSIONS_REQUEST")
     private List<Long> permissions;
 
     public Long getId() {

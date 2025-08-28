@@ -6,9 +6,11 @@ import com.example.library.dto.request.permission.PermissionUpdateRequest;
 import com.example.library.dto.response.Permission.PermissionListResponse;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.entity.Permission;
+import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.repository.PermissionRepository;
+import com.example.library.repository.RoleRepository;
 import com.example.library.service.PermissionService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
@@ -41,6 +43,8 @@ public class PermissionServiceImpl implements PermissionService {
     private PermissionRepository permissionRepository;
     @Autowired
     private Validator validator;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public Permission create(PermissionCreateRequest request) {
@@ -309,6 +313,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void delete(List<Long> ids) {
         List<Permission> permissions = permissionRepository.findAllById(ids);
         if (permissions.isEmpty()) {
@@ -325,6 +330,16 @@ public class PermissionServiceImpl implements PermissionService {
             permission.setStatus(-1);
         }
         permissionRepository.saveAll(permissions);
+        List<Role> relatedRoles = roleRepository.findDistinctByPermissions_IdIn(ids);
+        List<Long> deactivateRoleIds = relatedRoles.stream()
+                .filter(role -> role.getStatus() == 1)
+                .filter(role -> role.getPermissions().stream()
+                        .noneMatch(p -> p.getStatus() == 1))
+                .map(Role::getId)
+                .toList();
+        if (!deactivateRoleIds.isEmpty()) {
+            roleRepository.deactivateRoles(deactivateRoleIds);
+        }
     }
 
     @Override
