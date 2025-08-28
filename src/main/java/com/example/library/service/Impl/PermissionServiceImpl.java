@@ -182,12 +182,20 @@ public class PermissionServiceImpl implements PermissionService {
             cell.setCellValue(richText);
             cell.setCellStyle(headerStyle);
         }
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setWrapText(true);
         int rowIndex = 4;
         for (PermissionResponse p : permissionResponses) {
             Row row = sheet.createRow(rowIndex++);
-            row.createCell(0).setCellValue(p.getName());
-            row.createCell(1).setCellValue(p.getDescription());
-            row.createCell(2).setCellValue(p.getStatus() == 1 ? "Hoạt động" : "Không hoạt động");
+            Cell cell0 = row.createCell(0);
+            cell0.setCellValue(p.getName());
+            cell0.setCellStyle(dataStyle);
+            Cell cell1 = row.createCell(1);
+            cell1.setCellValue(p.getDescription());
+            cell1.setCellStyle(dataStyle);
+            Cell cell2 = row.createCell(2);
+            cell2.setCellValue(p.getStatus() == 1 ? "Hoạt động" : "Không hoạt động");
+            cell2.setCellStyle(dataStyle);
         }
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);

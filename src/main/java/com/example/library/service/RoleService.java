@@ -6,7 +6,9 @@ import com.example.library.dto.request.role.RoleUpdateRequest;
 import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.entity.Role;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface RoleService {
@@ -16,4 +18,6 @@ public interface RoleService {
     Role detail(Long id);
     List<RoleResponse> getListAutoSearch(String keyword);
     RoleListResponse getList(RoleListRequest request);
+    void exportTemplateExcel(HttpServletResponse response) throws IOException;
+    void exportToExcel(RoleListRequest request, HttpServletResponse response) throws IOException;
 }

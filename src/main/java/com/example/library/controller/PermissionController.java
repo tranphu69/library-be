@@ -55,7 +55,7 @@ public class PermissionController {
         permissionService.exportToExcel(request, response);
     }
 
-    @PostMapping("/template-file")
+    @GetMapping("/template-file")
     public void exportTemplate(HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         String fileName = "template_permissions.xlsx";

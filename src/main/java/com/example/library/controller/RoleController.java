@@ -10,11 +10,13 @@ import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.RoleService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -80,5 +82,21 @@ public class RoleController {
         ApiResponse<RoleListResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(response);
         return apiResponse;
+    }
+
+    @GetMapping("/template-file")
+    public void exportTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "template_roles.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        roleService.exportTemplateExcel(response);
+    }
+
+    @PostMapping("/export")
+    public void exportRoles(@RequestBody RoleListRequest request, HttpServletResponse response) throws IOException{
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "roles_list.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        roleService.exportToExcel(request, response);
     }
 }
