@@ -73,7 +73,7 @@ public class PermissionServiceImpl implements PermissionService {
                 request.getStatus(),
                 pageable
         );
-        List<PermissionResponse> permissionResponses = getListPermission(request, permissionPage);
+        List<PermissionResponse> permissionResponses = getListPermission(permissionPage);
         PermissionListResponse response = new PermissionListResponse();
         response.setData(permissionResponses);
         response.setCurrentPage(request.getPage());
@@ -109,7 +109,7 @@ public class PermissionServiceImpl implements PermissionService {
                 request.getStatus(),
                 pageable
         );
-        List<PermissionResponse> permissionResponses = getListPermission(request, permissionPage);
+        List<PermissionResponse> permissionResponses = getListPermission(permissionPage);
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Thông tin danh sách");
         CellStyle titleStyle = workbook.createCellStyle();
@@ -210,7 +210,7 @@ public class PermissionServiceImpl implements PermissionService {
         workbook.close();
     }
 
-    private List<PermissionResponse> getListPermission(PermissionListRequest request, Page<Permission> permissionPage) {
+    private List<PermissionResponse> getListPermission(Page<Permission> permissionPage) {
         return permissionPage.getContent()
                 .stream()
                 .map(permission -> {

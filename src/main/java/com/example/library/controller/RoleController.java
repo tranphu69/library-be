@@ -1,8 +1,10 @@
 package com.example.library.controller;
 
 import com.example.library.dto.request.role.RoleCreateRequest;
+import com.example.library.dto.request.role.RoleListRequest;
 import com.example.library.dto.request.role.RoleUpdateRequest;
 import com.example.library.dto.response.ApiResponse;
+import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
@@ -67,6 +69,16 @@ public class RoleController {
         List<RoleResponse> responses = roleService.getListAutoSearch(keyword);
         ApiResponse<List<RoleResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(responses);
+        return apiResponse;
+    }
+
+    @GetMapping
+    public ApiResponse<RoleListResponse> getList(
+            @Valid @ModelAttribute RoleListRequest request
+    ){
+        RoleListResponse response = roleService.getList(request);
+        ApiResponse<RoleListResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(response);
         return apiResponse;
     }
 }
