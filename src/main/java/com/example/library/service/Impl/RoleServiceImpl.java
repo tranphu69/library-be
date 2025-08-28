@@ -112,6 +112,11 @@ public class RoleServiceImpl implements RoleService {
         if (role.getStatus() == -1) {
             throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
         }
+        Set<Permission> activePermissions = role.getPermissions()
+                .stream()
+                .filter(p -> p.getStatus() == 1)
+                .collect(Collectors.toSet());
+        role.setPermissions(activePermissions);
         return role;
     }
 
@@ -429,7 +434,7 @@ public class RoleServiceImpl implements RoleService {
                     response.setStatus(role.getStatus());
                     Set<Permission> activePermissions = role.getPermissions()
                             .stream()
-                            .filter(p -> p.getStatus() != -1)
+                            .filter(p -> p.getStatus() != -1 && p.getStatus() != 0)
                             .collect(Collectors.toSet());
                     response.setPermissions(activePermissions);
                     return response;

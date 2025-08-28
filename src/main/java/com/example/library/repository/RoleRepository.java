@@ -37,6 +37,9 @@ AND (:permissions IS NULL OR (
     @Query("SELECT DISTINCT r FROM Role r JOIN r.permissions p WHERE p.id IN :permissionIds")
     List<Role> findDistinctByPermissions_IdIn(@Param("permissionIds") List<Long> permissionIds);
 
+    @Query("SELECT DISTINCT r FROM Role r JOIN r.permissions p WHERE p.id = :permissionId")
+    List<Role> findDistinctByPermissions_Id(@Param("permissionId") Long permissionId);
+
     @Modifying
     @Query("UPDATE Role r SET r.status = 0 WHERE r.id IN :ids")
     void deactivateRoles(@Param("ids") List<Long> ids);

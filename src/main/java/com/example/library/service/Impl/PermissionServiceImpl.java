@@ -59,12 +59,25 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public Permission update(PermissionUpdateRequest request) {
         Permission permission = permissionRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXSITED));
         permission.setName(request.getName());
         permission.setDescription(request.getDescription());
         permission.setStatus(request.getStatus());
+        if (request.getStatus() == 0){
+            List<Role> relatedRoles = roleRepository.findDistinctByPermissions_Id(request.getId());
+            List<Long> deactivateRoleIds = relatedRoles.stream()
+                    .filter(role -> role.getStatus() == 1)
+                    .filter(role -> role.getPermissions().stream()
+                            .noneMatch(p -> p.getStatus() == 1))
+                    .map(Role::getId)
+                    .toList();
+            if (!deactivateRoleIds.isEmpty()) {
+                roleRepository.deactivateRoles(deactivateRoleIds);
+            }
+        }
         return permissionRepository.save(permission);
     }
 
