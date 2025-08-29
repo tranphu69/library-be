@@ -269,7 +269,6 @@ public class RoleServiceImpl implements RoleService {
             validation.setShowErrorBox(true);
         }
         sheet.addValidationData(validation);
-
         List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
                 .stream().map(p -> {
                     PermissionResponse permissionResponse = new PermissionResponse();
@@ -349,7 +348,6 @@ public class RoleServiceImpl implements RoleService {
         sheet1.setColumnWidth(0, 8000);
         sheet1.setColumnWidth(1, 12000);
         sheet1.setColumnWidth(2, 10000);
-
         workbook.write(response.getOutputStream());
         workbook.close();
     }
@@ -492,7 +490,6 @@ public class RoleServiceImpl implements RoleService {
             validation.setShowErrorBox(true);
         }
         sheet.addValidationData(validation);
-
         List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
                 .stream().map(p -> {
                     PermissionResponse permissionResponse = new PermissionResponse();
@@ -570,7 +567,6 @@ public class RoleServiceImpl implements RoleService {
         sheet1.setColumnWidth(0, 8000);
         sheet1.setColumnWidth(1, 12000);
         sheet1.setColumnWidth(2, 10000);
-
         workbook.write(response.getOutputStream());
         workbook.close();
     }
