@@ -12,6 +12,8 @@ import com.example.library.exception.ErrorCode;
 import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.PermissionService;
+import com.example.library.utils.Utils;
+import com.example.library.utils.UtilsExcel;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -83,7 +85,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public PermissionListResponse getList(PermissionListRequest request) {
-        Sort sort = createSort(request.getSortBy(), request.getSortType());
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
         Page<Permission> permissionPage = permissionRepository.findPermissionsWithFilters(
                 request.getName(),
@@ -119,7 +121,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void exportToExcel(PermissionListRequest request, HttpServletResponse response) throws IOException {
-        Sort sort = createSort(request.getSortBy(), request.getSortType());
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
         Page<Permission> permissionPage = permissionRepository.findPermissionsWithFilters(
                 request.getName(),
@@ -235,38 +237,6 @@ public class PermissionServiceImpl implements PermissionService {
         workbook.close();
     }
 
-    private List<PermissionResponse> getListPermission(Page<Permission> permissionPage) {
-        return permissionPage.getContent()
-                .stream()
-                .map(permission -> {
-                    PermissionResponse response = new PermissionResponse();
-                    response.setId(permission.getId());
-                    response.setName(permission.getName());
-                    response.setDescription(permission.getDescription());
-                    response.setStatus(permission.getStatus());
-                    return response;
-                })
-                .collect(Collectors.toList());
-    }
-
-    private Sort createSort(String sortBy, String sortType) {
-        if (sortBy == null || sortBy.trim().isEmpty()) {
-            sortBy = "name";
-        }
-        if (!isValidSortField(sortBy)) {
-            sortBy = "name";
-        }
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortType)
-                ? Sort.Direction.DESC
-                : Sort.Direction.ASC;
-        return Sort.by(direction, sortBy);
-    }
-
-    private boolean isValidSortField(String sortBy) {
-        List<String> allowedFields = List.of("name", "status");
-        return allowedFields.contains(sortBy);
-    }
-
     @Override
     @Transactional
     public void importFromExcel(MultipartFile file) {
@@ -277,11 +247,11 @@ public class PermissionServiceImpl implements PermissionService {
             List<Permission> permissions = new ArrayList<>();
             for(int i = 4; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if(isRowEmpty(row)) continue;
+                if(UtilsExcel.isRowEmpty(row)) continue;
                 PermissionCreateRequest request = new PermissionCreateRequest();
-                request.setName(getCellValue(row.getCell(0)));
-                request.setDescription(getCellValue(row.getCell(1)));
-                String statusStr = getCellValue(row.getCell(2));
+                request.setName(UtilsExcel.getCellValue(row.getCell(0)));
+                request.setDescription(UtilsExcel.getCellValue(row.getCell(1)));
+                String statusStr = UtilsExcel.getCellValue(row.getCell(2));
                 Integer status = statusStr.isEmpty() ? null : statusStr.trim().equals("Hoạt động") ? 1 : 0;
                 request.setStatus(status);
                 Set<ConstraintViolation<PermissionCreateRequest>> violations = validator.validate(request);
@@ -305,24 +275,6 @@ public class PermissionServiceImpl implements PermissionService {
         } catch (IOException e) {
             throw new AppException(ErrorCode.NOT_READ_FILE);
         }
-    }
-
-    private boolean isRowEmpty(Row row) {
-        if (row == null) return true;
-        for (int c = 0; c < row.getLastCellNum(); c++) {
-            Cell cell = row.getCell(c);
-            if (cell != null && cell.getCellType() != CellType.BLANK && !getCellValue(cell).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String getCellValue(Cell cell) {
-        if (cell == null) return "";
-        if (cell.getCellType() == CellType.STRING) return cell.getStringCellValue().trim();
-        if (cell.getCellType() == CellType.NUMERIC) return String.valueOf((int) cell.getNumericCellValue());
-        return "";
     }
 
     @Override
@@ -458,5 +410,19 @@ public class PermissionServiceImpl implements PermissionService {
         sheet.addValidationData(validation);
         workbook.write(response.getOutputStream());
         workbook.close();
+    }
+
+    private List<PermissionResponse> getListPermission(Page<Permission> permissionPage) {
+        return permissionPage.getContent()
+                .stream()
+                .map(permission -> {
+                    PermissionResponse response = new PermissionResponse();
+                    response.setId(permission.getId());
+                    response.setName(permission.getName());
+                    response.setDescription(permission.getDescription());
+                    response.setStatus(permission.getStatus());
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 }

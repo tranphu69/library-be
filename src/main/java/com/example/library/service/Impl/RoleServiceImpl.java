@@ -1,11 +1,8 @@
 package com.example.library.service.Impl;
 
-import com.example.library.dto.request.permission.PermissionCreateRequest;
-import com.example.library.dto.request.permission.PermissionListRequest;
 import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.role.RoleListRequest;
 import com.example.library.dto.request.role.RoleUpdateRequest;
-import com.example.library.dto.response.Permission.PermissionListResponse;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
@@ -16,6 +13,8 @@ import com.example.library.exception.ErrorCode;
 import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.RoleService;
+import com.example.library.utils.Utils;
+import com.example.library.utils.UtilsExcel;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -144,9 +143,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleListResponse getList(RoleListRequest request) {
-        Sort sort = createSort(request.getSortBy(), request.getSortType());
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
-        List<Long> arrNumber = convertToLongList(request.getPermissions());
+        List<Long> arrNumber = Utils.convertToLongList(request.getPermissions());
         List<Permission> permissions = permissionRepository.findAllActiveById(arrNumber);
         if (permissions.size() != arrNumber.size()) {
             throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
@@ -357,9 +356,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void exportToExcel(RoleListRequest request, HttpServletResponse response) throws IOException {
-        Sort sort = createSort(request.getSortBy(), request.getSortType());
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
-        List<Long> arrNumber = convertToLongList(request.getPermissions());
+        List<Long> arrNumber = Utils.convertToLongList(request.getPermissions());
         List<Permission> permissions = permissionRepository.findAllActiveById(arrNumber);
         if (permissions.size() != arrNumber.size()) {
             throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
@@ -585,14 +584,14 @@ public class RoleServiceImpl implements RoleService {
             List<Role> roles = new ArrayList<>();
             for(int i = 4; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if(isRowEmpty(row)) continue;
+                if(UtilsExcel.isRowEmpty(row)) continue;
                 RoleCreateRequest request = new RoleCreateRequest();
-                request.setName(getCellValue(row.getCell(0)));
-                request.setDescription(getCellValue(row.getCell(1)));
-                String statusStr = getCellValue(row.getCell(2));
+                request.setName(UtilsExcel.getCellValue(row.getCell(0)));
+                request.setDescription(UtilsExcel.getCellValue(row.getCell(1)));
+                String statusStr = UtilsExcel.getCellValue(row.getCell(2));
                 Integer status = statusStr.isEmpty() ? null : statusStr.trim().equals("Hoạt động") ? 1 : 0;
                 request.setStatus(status);
-                String permissionStr = getCellValue(row.getCell(3));
+                String permissionStr = UtilsExcel.getCellValue(row.getCell(3));
                 List<String> permissionArr = Arrays.stream(permissionStr.split(","))
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
@@ -622,35 +621,6 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
-    private boolean isRowEmpty(Row row) {
-        if (row == null) return true;
-        for (int c = 0; c < row.getLastCellNum(); c++) {
-            Cell cell = row.getCell(c);
-            if (cell != null && cell.getCellType() != CellType.BLANK && !getCellValue(cell).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String getCellValue(Cell cell) {
-        if (cell == null) return "";
-        if (cell.getCellType() == CellType.STRING) return cell.getStringCellValue().trim();
-        if (cell.getCellType() == CellType.NUMERIC) return String.valueOf((int) cell.getNumericCellValue());
-        return "";
-    }
-
-    private List<Long> convertToLongList(String str) {
-        if (str == null || str.trim().isEmpty()) {
-            return List.of();
-        }
-        return Arrays.stream(str.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-    }
-
     private List<RoleResponse> getListRole(Page<Role> rolePage) {
         return rolePage.getContent()
                 .stream()
@@ -668,23 +638,5 @@ public class RoleServiceImpl implements RoleService {
                     return response;
                 })
                 .collect(Collectors.toList());
-    }
-
-    private boolean isValidSortField(String sortBy) {
-        List<String> allowedFields = List.of("name", "status");
-        return allowedFields.contains(sortBy);
-    }
-
-    private Sort createSort(String sortBy, String sortType) {
-        if (sortBy == null || sortBy.trim().isEmpty()) {
-            sortBy = "name";
-        }
-        if (!isValidSortField(sortBy)) {
-            sortBy = "name";
-        }
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortType)
-                ? Sort.Direction.DESC
-                : Sort.Direction.ASC;
-        return Sort.by(direction, sortBy);
     }
 }

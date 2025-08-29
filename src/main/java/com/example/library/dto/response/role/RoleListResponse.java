@@ -1,7 +1,5 @@
 package com.example.library.dto.response.role;
 
-import com.example.library.dto.response.Permission.PermissionResponse;
-
 import java.util.List;
 
 public class RoleListResponse {
