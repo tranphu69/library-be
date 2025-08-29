@@ -1,4 +1,4 @@
-package com.example.library.exception.controller;
+package com.example.library.controller;
 
 import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.role.RoleListRequest;
