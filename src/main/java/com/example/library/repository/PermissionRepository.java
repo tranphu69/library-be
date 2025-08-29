@@ -26,7 +26,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT p FROM Permission p WHERE p.id IN :ids AND p.status <> -1")
+    @Query("SELECT p FROM Permission p WHERE p.id IN :ids AND p.status = 1")
     List<Permission> findAllActiveById(@Param("ids") List<Long> ids);
 
     @Query("SELECT p FROM Permission p WHERE p.status = 1")

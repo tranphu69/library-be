@@ -29,6 +29,16 @@ public enum ErrorCode {
     PERMISSIONS_REQUEST(1016, "Phải chọn ít nhất một Permission", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXSITED(1018, "Role không tồn tại", HttpStatus.BAD_REQUEST),
     ROLE_STATUS_1(1019, "Với trạng thái hoạt động cần ít nhất một permission", HttpStatus.BAD_REQUEST),
+
+    //user
+    EMAIL_EXSITED(1026, "Email đã tồn tại", HttpStatus.BAD_REQUEST),
+    USERNAME_EXSITED(1027, "Username đã tồn tại", HttpStatus.BAD_REQUEST),
+    USERNAME_REQUEST(1020, "Trường username không được để trống", HttpStatus.BAD_REQUEST),
+    EMAIL_REQUEST(1021, "Trường email không được để trống", HttpStatus.BAD_REQUEST),
+    PASSWORD_REQUEST(1022, "Trường password không được để trống", HttpStatus.BAD_REQUEST),
+    USERNAME_MAX_LENGTH(1023, "Trường username tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
+    EMAIL_MAX_LENGTH(1024, "Trường email tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
+    PASSWORD_MIN_LENGTH(1025, "Trường password tối thiểu 8 kí tự", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;
