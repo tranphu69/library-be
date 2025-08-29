@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
@@ -27,6 +28,11 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     @Query("SELECT p FROM Permission p WHERE p.id IN :ids AND p.status <> -1")
     List<Permission> findAllActiveById(@Param("ids") List<Long> ids);
+
+    @Query("SELECT p FROM Permission p WHERE p.status = 1")
+    List<Permission> findAllStatus1();
+
+    Set<Permission> findByNameIn(List<String> names);
 
     @Query("""
             SELECT p FROM Permission p 

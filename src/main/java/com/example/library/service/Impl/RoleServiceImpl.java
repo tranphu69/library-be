@@ -1,5 +1,6 @@
 package com.example.library.service.Impl;
 
+import com.example.library.dto.request.permission.PermissionCreateRequest;
 import com.example.library.dto.request.permission.PermissionListRequest;
 import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.role.RoleListRequest;
@@ -16,6 +17,7 @@ import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.RoleService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -28,8 +30,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -195,7 +199,7 @@ public class RoleServiceImpl implements RoleService {
         headerStyle.setWrapText(true);
         Row headerRow = sheet.createRow(3);
         headerRow.setHeightInPoints(60);
-        String[] headers = {"Tên * \n(Tối đa 50 kí tự)", "Mô tả \n(Tối đa 255 kí tự)", "Trạng thái * \n(Hoạt động hoặc Không hoạt động)", "Permissions * \n(Chọn ít nhất 1 permission)"};
+        String[] headers = {"Tên * \n(Tối đa 50 kí tự)", "Mô tả \n(Tối đa 255 kí tự)", "Trạng thái * \n(Hoạt động hoặc Không hoạt động)", "Permissions * \n(Chọn ít nhất 1 permission trong danh sách permission nếu trạng thái là hoạt động)"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
@@ -266,6 +270,87 @@ public class RoleServiceImpl implements RoleService {
             validation.setShowErrorBox(true);
         }
         sheet.addValidationData(validation);
+
+        List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
+                .stream().map(p -> {
+                    PermissionResponse permissionResponse = new PermissionResponse();
+                    permissionResponse.setName(p.getName());
+                    permissionResponse.setDescription(p.getDescription());
+                    permissionResponse.setStatus(p.getStatus());
+                    return permissionResponse;
+                }).toList();
+        Sheet sheet1 = workbook.createSheet("Danh sách permission");
+        Row titleRow1 = sheet1.createRow(1);
+        titleRow1.setHeightInPoints(30);
+        Cell titleCell1 = titleRow1.createCell(0);
+        titleCell1.setCellValue("DANH SÁCH PERMISSION");
+        titleCell1.setCellStyle(titleStyle);
+        sheet1.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
+        Row headerRow1 = sheet1.createRow(3);
+        headerRow1.setHeightInPoints(60);
+        for (int i = 0; i < headers.length - 1; i++) {
+            Cell cell = headerRow1.createCell(i);
+            XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
+            Font fontTitle = workbook.createFont();
+            Font fontStar = workbook.createFont();
+            Font fontDesc = workbook.createFont();
+            switch (i) {
+                case 0:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 3, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(3, 5, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 1:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 5, fontTitle);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 2:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 10, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(10, 12, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(13, headers[i].length(), fontDesc);
+                    break;
+            }
+            cell.setCellValue(richText);
+            cell.setCellStyle(headerStyle);
+        }
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setWrapText(true);
+        int rowIndex = 4;
+        for (PermissionResponse p : permissionResponses) {
+            Row row = sheet1.createRow(rowIndex++);
+            Cell cell0 = row.createCell(0);
+            cell0.setCellValue(p.getName());
+            cell0.setCellStyle(dataStyle);
+            Cell cell1 = row.createCell(1);
+            cell1.setCellValue(p.getDescription());
+            cell1.setCellStyle(dataStyle);
+            Cell cell2 = row.createCell(2);
+            cell2.setCellValue(p.getStatus() == 1 ? "Hoạt động" : "Không hoạt động");
+            cell2.setCellStyle(dataStyle);
+        }
+        for (int i = 0; i < headers.length - 1; i++) {
+            sheet1.autoSizeColumn(i);
+        }
+        sheet1.setColumnWidth(0, 8000);
+        sheet1.setColumnWidth(1, 12000);
+        sheet1.setColumnWidth(2, 10000);
+
         workbook.write(response.getOutputStream());
         workbook.close();
     }
@@ -316,7 +401,7 @@ public class RoleServiceImpl implements RoleService {
         headerStyle.setWrapText(true);
         Row headerRow = sheet.createRow(3);
         headerRow.setHeightInPoints(60);
-        String[] headers = {"Tên * \n(Tối đa 50 kí tự)", "Mô tả \n(Tối đa 255 kí tự)", "Trạng thái * \n(Hoạt động hoặc Không hoạt động)", "Permissions * \n(Chọn ít nhất 1 permission)"};
+        String[] headers = {"Tên * \n(Tối đa 50 kí tự)", "Mô tả \n(Tối đa 255 kí tự)", "Trạng thái * \n(Hoạt động hoặc Không hoạt động)", "Permissions * \n(Chọn ít nhất 1 permission trong danh sách permission nếu trạng thái là hoạt động)"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
@@ -408,8 +493,151 @@ public class RoleServiceImpl implements RoleService {
             validation.setShowErrorBox(true);
         }
         sheet.addValidationData(validation);
+
+        List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
+                .stream().map(p -> {
+                    PermissionResponse permissionResponse = new PermissionResponse();
+                    permissionResponse.setName(p.getName());
+                    permissionResponse.setDescription(p.getDescription());
+                    permissionResponse.setStatus(p.getStatus());
+                    return permissionResponse;
+                }).toList();
+        Sheet sheet1 = workbook.createSheet("Danh sách permission");
+        Row titleRow1 = sheet1.createRow(1);
+        titleRow1.setHeightInPoints(30);
+        Cell titleCell1 = titleRow1.createCell(0);
+        titleCell1.setCellValue("DANH SÁCH PERMISSION");
+        titleCell1.setCellStyle(titleStyle);
+        sheet1.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
+        Row headerRow1 = sheet1.createRow(3);
+        headerRow1.setHeightInPoints(60);
+        for (int i = 0; i < headers.length - 1; i++) {
+            Cell cell = headerRow1.createCell(i);
+            XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
+            Font fontTitle = workbook.createFont();
+            Font fontStar = workbook.createFont();
+            Font fontDesc = workbook.createFont();
+            switch (i) {
+                case 0:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 3, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(3, 5, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 1:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 5, fontTitle);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(6, headers[i].length(), fontDesc);
+                    break;
+                case 2:
+                    fontTitle.setBold(true);
+                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(0, 10, fontTitle);
+                    fontStar.setBold(true);
+                    fontStar.setColor(IndexedColors.RED.getIndex());
+                    richText.applyFont(10, 12, fontStar);
+                    fontDesc.setItalic(true);
+                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
+                    richText.applyFont(13, headers[i].length(), fontDesc);
+                    break;
+            }
+            cell.setCellValue(richText);
+            cell.setCellStyle(headerStyle);
+        }
+        int rowIndex1 = 4;
+        for (PermissionResponse p : permissionResponses) {
+            Row row = sheet1.createRow(rowIndex1++);
+            Cell cell0 = row.createCell(0);
+            cell0.setCellValue(p.getName());
+            cell0.setCellStyle(dataStyle);
+            Cell cell1 = row.createCell(1);
+            cell1.setCellValue(p.getDescription());
+            cell1.setCellStyle(dataStyle);
+            Cell cell2 = row.createCell(2);
+            cell2.setCellValue(p.getStatus() == 1 ? "Hoạt động" : "Không hoạt động");
+            cell2.setCellStyle(dataStyle);
+        }
+        for (int i = 0; i < headers.length - 1; i++) {
+            sheet1.autoSizeColumn(i);
+        }
+        sheet1.setColumnWidth(0, 8000);
+        sheet1.setColumnWidth(1, 12000);
+        sheet1.setColumnWidth(2, 10000);
+
         workbook.write(response.getOutputStream());
         workbook.close();
+    }
+
+    @Override
+    public void importFromExcel(MultipartFile file) {
+        try (InputStream is = file.getInputStream()){
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheetAt(0);
+            Set<String> excelNames = new HashSet<>();
+            List<Role> roles = new ArrayList<>();
+            for(int i = 4; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if(isRowEmpty(row)) continue;
+                RoleCreateRequest request = new RoleCreateRequest();
+                request.setName(getCellValue(row.getCell(0)));
+                request.setDescription(getCellValue(row.getCell(1)));
+                String statusStr = getCellValue(row.getCell(2));
+                Integer status = statusStr.isEmpty() ? null : statusStr.trim().equals("Hoạt động") ? 1 : 0;
+                request.setStatus(status);
+                String permissionStr = getCellValue(row.getCell(3));
+                List<String> permissionArr = Arrays.stream(permissionStr.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .toList();
+                Set<Permission> permissions = permissionRepository.findByNameIn(permissionArr);
+                Set<ConstraintViolation<RoleCreateRequest>> violations = validator.validate(request);
+                if (!violations.isEmpty()) {
+                    throw new AppException(ErrorCode.ERROR_FILE);
+                }
+                if (!excelNames.add(request.getName())){
+                    throw new AppException(ErrorCode.ERROR_FILE);
+                }
+                if (roleRepository.existsByName(request.getName())){
+                    throw new AppException(ErrorCode.ERROR_FILE);
+                }
+                Role role = new Role();
+                role.setName(request.getName());
+                role.setDescription(request.getDescription());
+                role.setStatus(request.getStatus());
+                role.setPermissions(new HashSet<>(permissions));
+                roles.add(role);
+            }
+            roleRepository.saveAll(roles);
+            workbook.close();
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.NOT_READ_FILE);
+        }
+    }
+
+    private boolean isRowEmpty(Row row) {
+        if (row == null) return true;
+        for (int c = 0; c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c);
+            if (cell != null && cell.getCellType() != CellType.BLANK && !getCellValue(cell).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String getCellValue(Cell cell) {
+        if (cell == null) return "";
+        if (cell.getCellType() == CellType.STRING) return cell.getStringCellValue().trim();
+        if (cell.getCellType() == CellType.NUMERIC) return String.valueOf((int) cell.getNumericCellValue());
+        return "";
     }
 
     private List<Long> convertToLongList(String str) {

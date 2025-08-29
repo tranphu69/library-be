@@ -1,4 +1,4 @@
-package com.example.library.controller;
+package com.example.library.exception.controller;
 
 import com.example.library.dto.request.permission.PermissionCreateRequest;
 import com.example.library.dto.request.permission.PermissionListRequest;

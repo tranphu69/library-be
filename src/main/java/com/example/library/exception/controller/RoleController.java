@@ -1,4 +1,4 @@
-package com.example.library.controller;
+package com.example.library.exception.controller;
 
 import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.role.RoleListRequest;
@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -98,5 +99,13 @@ public class RoleController {
         String fileName = "roles_list.xlsx";
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
         roleService.exportToExcel(request, response);
+    }
+
+    @PostMapping("/import")
+    public ApiResponse<?> importPermission(@RequestParam("file")MultipartFile file) {
+        roleService.importFromExcel(file);
+        ApiResponse<?> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thành công");
+        return apiResponse;
     }
 }

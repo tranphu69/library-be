@@ -286,13 +286,13 @@ public class PermissionServiceImpl implements PermissionService {
                 request.setStatus(status);
                 Set<ConstraintViolation<PermissionCreateRequest>> violations = validator.validate(request);
                 if (!violations.isEmpty()) {
-                    throw new AppException(ErrorCode.PERMISSION_ERROR_FILE);
+                    throw new AppException(ErrorCode.ERROR_FILE);
                 }
                 if (!excelNames.add(request.getName())){
-                    throw new AppException(ErrorCode.PERMISSION_ERROR_FILE);
+                    throw new AppException(ErrorCode.ERROR_FILE);
                 }
                 if (permissionRepository.existsByName(request.getName())){
-                    throw new AppException(ErrorCode.PERMISSION_ERROR_FILE);
+                    throw new AppException(ErrorCode.ERROR_FILE);
                 }
                 Permission permission = new Permission();
                 permission.setName(request.getName());
@@ -303,7 +303,7 @@ public class PermissionServiceImpl implements PermissionService {
             permissionRepository.saveAll(permissions);
             workbook.close();
         } catch (IOException e) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_READ_FILE);
+            throw new AppException(ErrorCode.NOT_READ_FILE);
         }
     }
 

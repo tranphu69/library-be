@@ -17,12 +17,12 @@ public enum ErrorCode {
     DESCRIPTION_MAX_LENGTH(1013, "Trường description tối đa 255 kí tự", HttpStatus.BAD_REQUEST),
     STATUS_REQUEST(1010, "Trường status không được để trống", HttpStatus.BAD_REQUEST),
     INVALID(1013, "Giá trị không hợp lệ", HttpStatus.BAD_REQUEST),
+    ERROR_FILE(1015, "Dữ liệu không đúng", HttpStatus.BAD_REQUEST),
+    NOT_READ_FILE(1014, "Không thể đọc file Excel", HttpStatus.BAD_REQUEST),
 
     //permisson
     PERMISSION_EXSITED(1007, "Permission đã tồn tại", HttpStatus.BAD_REQUEST),
     PERMISSION_NOT_EXSITED(1011, "Permission không tồn tại", HttpStatus.BAD_REQUEST),
-    PERMISSION_NOT_READ_FILE(1014, "Không thể đọc file Excel", HttpStatus.BAD_REQUEST),
-    PERMISSION_ERROR_FILE(1015, "Dữ liệu không đúng", HttpStatus.BAD_REQUEST),
 
     //role
     ROLE_EXSITED(1017, "Role đã tồn tại", HttpStatus.BAD_REQUEST),
