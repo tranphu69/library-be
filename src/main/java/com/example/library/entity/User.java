@@ -1,6 +1,8 @@
 package com.example.library.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +18,13 @@ public class User {
     private String username;
     private String email;
     private String password;
+    @Column(name = "is_active")
     private Integer isActive;
+    @CreationTimestamp
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

@@ -1,6 +1,6 @@
 package com.example.library.dto.response.user;
 
-import com.example.library.entity.Role;
+import com.example.library.dto.response.role.RoleResponseNoPermission;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -12,7 +12,7 @@ public class UserResponse {
     private Integer isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Set<Role> roles;
+    private Set<RoleResponseNoPermission> roles;
 
     public Long getId() {
         return id;
@@ -42,7 +42,7 @@ public class UserResponse {
         return isActive;
     }
 
-    public void setIs_active(Integer isActive) {
+    public void setIsActive(Integer isActive) {
         this.isActive = isActive;
     }
 
@@ -62,11 +62,11 @@ public class UserResponse {
         this.updatedAt = updatedAt;
     }
 
-    public Set<Role> getRoles() {
+    public Set<RoleResponseNoPermission> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Set<RoleResponseNoPermission> roles) {
         this.roles = roles;
     }
 }
