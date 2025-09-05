@@ -43,4 +43,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }

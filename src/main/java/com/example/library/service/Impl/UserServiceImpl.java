@@ -1,6 +1,7 @@
 package com.example.library.service.Impl;
 
 import com.example.library.dto.request.user.UserCreateRequest;
+import com.example.library.dto.request.user.UserUpdateRequest;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;
@@ -37,6 +38,37 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
+        user.setIsActive(request.getIsActive());
+        List<Role> roles;
+        if(request.getRoles().isEmpty()){
+            roles = roleRepository.findByName("USER");
+            if (roles.isEmpty()) {
+                throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            } else {
+                user.setRoles(new HashSet<>(roles));
+            }
+        } else {
+            roles = roleRepository.findAllActiveById(request.getRoles());
+            if (roles.size() != request.getRoles().size()){
+                throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            }
+            user.setRoles(new HashSet<>(roles));
+        }
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User update(UserUpdateRequest request) {
+        User user = userRepository.findById(request.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXSITED));
+        if (userRepository.existsByEmailAndIdNot(request.getEmail(), request.getId())) {
+            throw new AppException(ErrorCode.EMAIL_EXSITED);
+        }
+        if (userRepository.existsByUsernameAndIdNot(request.getUsername(), request.getId())) {
+            throw new AppException(ErrorCode.USERNAME_EXSITED);
+        }
+        user.setEmail(request.getEmail());
+        user.setUsername(request.getUsername());
         user.setIsActive(request.getIsActive());
         List<Role> roles;
         if(request.getRoles().isEmpty()){

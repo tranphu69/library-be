@@ -65,6 +65,9 @@ public class PermissionServiceImpl implements PermissionService {
     public Permission update(PermissionUpdateRequest request) {
         Permission permission = permissionRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXSITED));
+        if(permissionRepository.existsByNameAndIdNot(request.getName(), request.getId())){
+            throw new AppException(ErrorCode.PERMISSION_EXSITED);
+        }
         permission.setName(request.getName());
         permission.setDescription(request.getDescription());
         permission.setStatus(request.getStatus());

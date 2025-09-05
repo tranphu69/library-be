@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.dto.request.user.UserCreateRequest;
+import com.example.library.dto.request.user.UserUpdateRequest;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.user.UserResponse;
 import com.example.library.entity.User;
@@ -25,6 +26,15 @@ public class UserController {
     public ApiResponse<UserResponse> create(@Valid @RequestBody UserCreateRequest request){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         User user = userService.create(request);
+        UserResponse response = modelMapper.map(user, UserResponse.class);
+        apiResponse.setResult(response);
+        return apiResponse;
+    }
+
+    @PutMapping
+    public ApiResponse<UserResponse> update(@Valid @RequestBody UserUpdateRequest request){
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        User user = userService.update(request);
         UserResponse response = modelMapper.map(user, UserResponse.class);
         apiResponse.setResult(response);
         return apiResponse;

@@ -72,6 +72,9 @@ public class RoleServiceImpl implements RoleService {
     public Role update(RoleUpdateRequest request) {
         Role role = roleRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXSITED));
+        if(roleRepository.existsByNameAndIdNot(request.getName(), request.getId())) {
+            throw new AppException(ErrorCode.ROLE_EXSITED);
+        }
         if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
             throw new AppException(ErrorCode.ROLE_STATUS_1);
         }

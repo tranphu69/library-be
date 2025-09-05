@@ -31,6 +31,7 @@ public enum ErrorCode {
     ROLE_STATUS_1(1019, "Với trạng thái hoạt động cần ít nhất một permission", HttpStatus.BAD_REQUEST),
 
     //user
+    USER_NOT_EXSITED(1018, "User không tồn tại", HttpStatus.BAD_REQUEST),
     EMAIL_EXSITED(1026, "Email đã tồn tại", HttpStatus.BAD_REQUEST),
     USERNAME_EXSITED(1027, "Username đã tồn tại", HttpStatus.BAD_REQUEST),
     USERNAME_REQUEST(1020, "Trường username không được để trống", HttpStatus.BAD_REQUEST),
