@@ -12,6 +12,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
@@ -35,6 +38,24 @@ public class UserController {
     public ApiResponse<UserResponse> update(@Valid @RequestBody UserUpdateRequest request){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         User user = userService.update(request);
+        UserResponse response = modelMapper.map(user, UserResponse.class);
+        apiResponse.setResult(response);
+        return apiResponse;
+    }
+
+    @PostMapping("/delete")
+    public ApiResponse<String> delete(@RequestBody Map<String, List<Long>> request) {
+        List<Long> ids = request.get("list");
+        userService.delete(ids);
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setResult("Delete users successful!");
+        return apiResponse;
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<UserResponse> getDetail(@PathVariable("id") Long id) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        User user = userService.detail(id);
         UserResponse response = modelMapper.map(user, UserResponse.class);
         apiResponse.setResult(response);
         return apiResponse;

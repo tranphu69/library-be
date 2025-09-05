@@ -2,6 +2,8 @@ package com.example.library.service.Impl;
 
 import com.example.library.dto.request.user.UserCreateRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
+import com.example.library.dto.response.role.RoleResponseNoPermission;
+import com.example.library.dto.response.user.UserResponse;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;
@@ -11,11 +13,15 @@ import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -86,5 +92,39 @@ public class UserServiceImpl implements UserService {
             user.setRoles(new HashSet<>(roles));
         }
         return userRepository.save(user);
+    }
+
+    @Override
+    public void delete(List<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+        if(users.isEmpty()){
+            throw new AppException(ErrorCode.USER_NOT_EXSITED);
+        }
+        List<Long> deleteIds = users.stream()
+                .filter(p -> p.getIsActive() == -1)
+                .map(User::getId)
+                .toList();
+        if(!deleteIds.isEmpty()){
+            throw new AppException(ErrorCode.USER_NOT_EXSITED);
+        }
+        for (User user : users) {
+            user.setIsActive(-1);
+        }
+        userRepository.saveAll(users);
+    }
+
+    @Override
+    public User detail(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXSITED));
+        if(user.getIsActive() == -1){
+            throw new AppException(ErrorCode.USER_NOT_EXSITED);
+        }
+        Set<Role> activeRole = user.getRoles()
+                .stream()
+                .filter(p -> p.getStatus() == 1)
+                .collect(Collectors.toSet());
+        user.setRoles(activeRole);
+        return user;
     }
 }
