@@ -40,6 +40,7 @@ public enum ErrorCode {
     USERNAME_MAX_LENGTH(1023, "Trường username tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
     EMAIL_MAX_LENGTH(1024, "Trường email tối đa 50 kí tự", HttpStatus.BAD_REQUEST),
     PASSWORD_MIN_LENGTH(1025, "Trường password tối thiểu 8 kí tự", HttpStatus.BAD_REQUEST),
+    ERROR_TYPE(1026, "Trường tìm kiếm không hợp lệ", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

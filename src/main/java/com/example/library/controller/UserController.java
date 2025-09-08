@@ -4,7 +4,10 @@ import com.example.library.dto.request.user.UserCreateRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.user.UserResponse;
+import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
+import com.example.library.exception.AppException;
+import com.example.library.exception.ErrorCode;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
 import jakarta.validation.Valid;
@@ -58,6 +61,20 @@ public class UserController {
         User user = userService.detail(id);
         UserResponse response = modelMapper.map(user, UserResponse.class);
         apiResponse.setResult(response);
+        return apiResponse;
+    }
+
+    @GetMapping("/auto-search")
+    public ApiResponse<List<UserResponseNoRole>> getListAutoSearch(
+            @RequestParam("keyword") String keyword,
+            @RequestParam("type") String type
+    ) {
+        if(!"email".equalsIgnoreCase(type) && !"username".equalsIgnoreCase(type)) {
+            throw new AppException(ErrorCode.ERROR_TYPE);
+        }
+        List<UserResponseNoRole> results = userService.getListAutoSearch(keyword, type);
+        ApiResponse<List<UserResponseNoRole>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(results);
         return apiResponse;
     }
 }

@@ -6,6 +6,7 @@ import com.example.library.dto.request.role.RoleUpdateRequest;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
+import com.example.library.dto.response.role.RoleResponseNoPermission;
 import com.example.library.entity.Role;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.RoleService;
@@ -67,9 +68,9 @@ public class RoleController {
     }
 
     @GetMapping("/auto-search")
-    public ApiResponse<List<RoleResponse>> getListAutoSearch(@RequestParam String keyword){
-        List<RoleResponse> responses = roleService.getListAutoSearch(keyword);
-        ApiResponse<List<RoleResponse>> apiResponse = new ApiResponse<>();
+    public ApiResponse<List<RoleResponseNoPermission>> getListAutoSearch(@RequestParam String keyword){
+        List<RoleResponseNoPermission> responses = roleService.getListAutoSearch(keyword);
+        ApiResponse<List<RoleResponseNoPermission>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(responses);
         return apiResponse;
     }

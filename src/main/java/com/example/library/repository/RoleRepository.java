@@ -2,6 +2,7 @@ package com.example.library.repository;
 
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
+import com.example.library.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,15 +50,7 @@ AND (:permissions IS NULL OR (
     @Query("SELECT r FROM Role r WHERE r.id IN :ids AND r.status = 1")
     List<Role> findAllActiveById(@Param("ids") List<Long> ids);
 
-    @Query("""
-    SELECT r FROM Role r
-    WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    AND r.status <> -1
-""")
-    Page<Role> search(
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
+    List<Role> findByNameStartingWithIgnoreCase(String name);
 
     boolean existsByNameAndIdNot(String name, Long id);
 }

@@ -4,6 +4,7 @@ import com.example.library.dto.request.user.UserCreateRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
 import com.example.library.dto.response.role.RoleResponseNoPermission;
 import com.example.library.dto.response.user.UserResponse;
+import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -126,5 +128,25 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toSet());
         user.setRoles(activeRole);
         return user;
+    }
+
+    @Override
+    public List<UserResponseNoRole> getListAutoSearch(String keyword, String type) {
+        List<User> users = List.of();
+        String normalizedQuery = keyword.trim();
+        if (Objects.equals(type, "email")) {
+            users = userRepository.findByEmailStartingWithIgnoreCase(normalizedQuery);
+        } else if (Objects.equals(type, "username")) {
+            users = userRepository.findByUsernameStartingWithIgnoreCase(normalizedQuery);
+        }
+        return users.stream()
+                .map(user -> {
+                    UserResponseNoRole response = new UserResponseNoRole();
+                    response.setId(user.getId());
+                    response.setUsername(user.getUsername());
+                    response.setEmail(user.getEmail());
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
@@ -16,14 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmailAndIdNot(String email, Long id);
     boolean existsByUsernameAndIdNot(String username, Long id);
 
-    @Query("""
-    SELECT u FROM User u
-    WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    AND r.status <> -1
-""")
-    Page<User> search(
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
+    List<User> findByEmailStartingWithIgnoreCase(String email);
+    List<User> findByUsernameStartingWithIgnoreCase(String username);
 }

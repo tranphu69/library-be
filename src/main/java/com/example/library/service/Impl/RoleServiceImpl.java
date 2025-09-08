@@ -6,6 +6,7 @@ import com.example.library.dto.request.role.RoleUpdateRequest;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
+import com.example.library.dto.response.role.RoleResponseNoPermission;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
@@ -127,18 +128,15 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleResponse> getListAutoSearch(String keyword) {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Role> rolePage = roleRepository.search(keyword, pageable);
-        return rolePage.getContent()
-                .stream()
+    public List<RoleResponseNoPermission> getListAutoSearch(String keyword) {
+        String normalizedQuery = keyword.trim();
+        List<Role> roles = roleRepository.findByNameStartingWithIgnoreCase(normalizedQuery);
+        return roles.stream()
                 .map(role -> {
-                    RoleResponse response = new RoleResponse();
+                    RoleResponseNoPermission response = new RoleResponseNoPermission();
                     response.setId(role.getId());
                     response.setName(role.getName());
                     response.setDescription(role.getDescription());
-                    response.setStatus(role.getStatus());
-                    response.setPermissions(role.getPermissions());
                     return response;
                 })
                 .collect(Collectors.toList());
