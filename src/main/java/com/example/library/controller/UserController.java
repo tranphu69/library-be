@@ -1,8 +1,10 @@
 package com.example.library.controller;
 
 import com.example.library.dto.request.user.UserCreateRequest;
+import com.example.library.dto.request.user.UserListRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
 import com.example.library.dto.response.ApiResponse;
+import com.example.library.dto.response.user.UserListResponse;
 import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
@@ -76,5 +78,15 @@ public class UserController {
         ApiResponse<List<UserResponseNoRole>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(results);
         return apiResponse;
+    }
+
+    @GetMapping
+    public ApiResponse<UserListResponse> getList(
+            @Valid @ModelAttribute UserListRequest request
+    ){
+       UserListResponse response = userService.getList(request);
+       ApiResponse<UserListResponse> apiResponse = new ApiResponse<>();
+       apiResponse.setResult(response);
+       return apiResponse;
     }
 }

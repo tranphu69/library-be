@@ -1,6 +1,5 @@
 package com.example.library.repository;
 
-import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +19,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByEmailStartingWithIgnoreCase(String email);
     List<User> findByUsernameStartingWithIgnoreCase(String username);
+
+    @Query("""
+SELECT u FROM User u
+WHERE u.isActive <> -1 
+AND (:email IS NULL OR LOWER(u.email) LIKE LOWER(CONCAT('%', :email, '%')))
+AND (:isActive IS NULL OR u.isActive = :isActive)
+AND (:username IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%')))
+AND (:roles IS NULL OR (
+    SELECT COUNT(DISTINCT r.id)
+    FROM u.roles r
+    WHERE r.status = 1 AND r.id IN :roles
+) = :#{#roles.size()})
+""")
+    Page<User> findUsersWithFilter(
+            @Param("email") String email,
+            @Param("isActive") Integer isActive,
+            @Param("username") String username,
+            @Param("roles") List<Long> roles,
+            Pageable pageable
+    );
 }

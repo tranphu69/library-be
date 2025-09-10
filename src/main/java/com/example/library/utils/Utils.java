@@ -20,10 +20,10 @@ public class Utils {
 
     public static Sort createSort(String sortBy, String sortType) {
         if (sortBy == null || sortBy.trim().isEmpty()) {
-            sortBy = "name";
+            sortBy = "username";
         }
         if (!isValidSortField(sortBy)) {
-            sortBy = "name";
+            sortBy = "username";
         }
         Sort.Direction direction = "desc".equalsIgnoreCase(sortType)
                 ? Sort.Direction.DESC
@@ -32,7 +32,7 @@ public class Utils {
     }
 
     public static boolean isValidSortField(String sortBy) {
-        List<String> allowedFields = List.of("name", "status");
+        List<String> allowedFields = List.of("username", "isActive");
         return allowedFields.contains(sortBy);
     }
 }

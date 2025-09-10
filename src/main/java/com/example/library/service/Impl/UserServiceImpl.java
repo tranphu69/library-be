@@ -1,10 +1,14 @@
 package com.example.library.service.Impl;
 
 import com.example.library.dto.request.user.UserCreateRequest;
+import com.example.library.dto.request.user.UserListRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
+import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.dto.response.role.RoleResponseNoPermission;
+import com.example.library.dto.response.user.UserListResponse;
 import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
+import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;
@@ -12,11 +16,14 @@ import com.example.library.exception.ErrorCode;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
+import com.example.library.utils.Utils;
 import jakarta.validation.Validator;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -33,6 +40,8 @@ public class UserServiceImpl implements UserService {
     private Validator validator;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public User create(UserCreateRequest request) {
@@ -145,6 +154,56 @@ public class UserServiceImpl implements UserService {
                     response.setId(user.getId());
                     response.setUsername(user.getUsername());
                     response.setEmail(user.getEmail());
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserListResponse getList(UserListRequest request) {
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
+        List<Long> arrNumber = Utils.convertToLongList(request.getRoles());
+        List<Role> roles = roleRepository.findAllActiveById(arrNumber);
+        if (roles.size() != arrNumber.size()) {
+            throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+        }
+        Page<User> userPage = userRepository.findUsersWithFilter(
+                request.getEmail(),
+                request.getIsActive(),
+                request.getUsername(),
+                arrNumber,
+                pageable
+        );
+        List<UserResponse> userResponses = getListUser(userPage);
+        UserListResponse response = new UserListResponse();
+        response.setData(userResponses);
+        response.setCurrentPage(request.getPage());
+        response.setCurrentSize(userPage.getSize());
+        response.setTotalPages(userPage.getTotalPages());
+        response.setTotalElements((int) userPage.getTotalElements());
+        return response;
+    }
+
+    private List<UserResponse> getListUser(Page<User> userPage) {
+        return userPage.getContent()
+                .stream()
+                .map(user -> {
+                    UserResponse response = new UserResponse();
+                    response.setId(user.getId());
+                    response.setUsername(user.getUsername());
+                    response.setEmail(user.getEmail());
+                    response.setIsActive(user.getIsActive());
+                    response.setCreatedAt(user.getCreatedAt());
+                    response.setUpdatedAt(user.getUpdatedAt());
+                    Set<Role> activeRoles = user.getRoles()
+                            .stream()
+                            .filter(p -> p.getStatus() != -1 && p.getStatus() != 0)
+                            .collect(Collectors.toSet());
+                    Set<RoleResponseNoPermission> roleResponses = activeRoles.stream()
+                            .map(role -> modelMapper.map(role, RoleResponseNoPermission.class))
+                            .collect(Collectors.toSet());
+                    response.setRoles(roleResponses);
                     return response;
                 })
                 .collect(Collectors.toList());
