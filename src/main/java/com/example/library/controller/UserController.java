@@ -12,11 +12,13 @@ import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -88,5 +90,13 @@ public class UserController {
        ApiResponse<UserListResponse> apiResponse = new ApiResponse<>();
        apiResponse.setResult(response);
        return apiResponse;
+    }
+
+    @GetMapping("/template-file")
+    public void exportTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "template_users.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        userService.exportTemplateExcel(response);
     }
 }

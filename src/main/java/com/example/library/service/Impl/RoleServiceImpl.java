@@ -286,45 +286,14 @@ public class RoleServiceImpl implements RoleService {
         titleCell1.setCellStyle(titleStyle);
         sheet1.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
         Row headerRow1 = sheet1.createRow(3);
+        String[] headers1 = { "Tên", "Mô tả", "Trạng thái" };
         headerRow1.setHeightInPoints(60);
-        for (int i = 0; i < headers.length - 1; i++) {
+        for (int i = 0; i < headers1.length; i++) {
             Cell cell = headerRow1.createCell(i);
-            XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
+            XSSFRichTextString richText = new XSSFRichTextString(headers1[i]);
             Font fontTitle = workbook.createFont();
-            Font fontStar = workbook.createFont();
-            Font fontDesc = workbook.createFont();
-            switch (i) {
-                case 0:
-                    fontTitle.setBold(true);
-                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(0, 3, fontTitle);
-                    fontStar.setBold(true);
-                    fontStar.setColor(IndexedColors.RED.getIndex());
-                    richText.applyFont(3, 5, fontStar);
-                    fontDesc.setItalic(true);
-                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(6, headers[i].length(), fontDesc);
-                    break;
-                case 1:
-                    fontTitle.setBold(true);
-                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(0, 5, fontTitle);
-                    fontDesc.setItalic(true);
-                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(6, headers[i].length(), fontDesc);
-                    break;
-                case 2:
-                    fontTitle.setBold(true);
-                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(0, 10, fontTitle);
-                    fontStar.setBold(true);
-                    fontStar.setColor(IndexedColors.RED.getIndex());
-                    richText.applyFont(10, 12, fontStar);
-                    fontDesc.setItalic(true);
-                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(13, headers[i].length(), fontDesc);
-                    break;
-            }
+            fontTitle.setBold(true);
+            fontTitle.setColor(IndexedColors.BLACK.getIndex());
             cell.setCellValue(richText);
             cell.setCellStyle(headerStyle);
         }
@@ -507,45 +476,14 @@ public class RoleServiceImpl implements RoleService {
         titleCell1.setCellStyle(titleStyle);
         sheet1.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
         Row headerRow1 = sheet1.createRow(3);
+        String[] headers1 = { "Tên", "Mô tả", "Trạng thái" };
         headerRow1.setHeightInPoints(60);
-        for (int i = 0; i < headers.length - 1; i++) {
+        for (int i = 0; i < headers1.length; i++) {
             Cell cell = headerRow1.createCell(i);
-            XSSFRichTextString richText = new XSSFRichTextString(headers[i]);
+            XSSFRichTextString richText = new XSSFRichTextString(headers1[i]);
             Font fontTitle = workbook.createFont();
-            Font fontStar = workbook.createFont();
-            Font fontDesc = workbook.createFont();
-            switch (i) {
-                case 0:
-                    fontTitle.setBold(true);
-                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(0, 3, fontTitle);
-                    fontStar.setBold(true);
-                    fontStar.setColor(IndexedColors.RED.getIndex());
-                    richText.applyFont(3, 5, fontStar);
-                    fontDesc.setItalic(true);
-                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(6, headers[i].length(), fontDesc);
-                    break;
-                case 1:
-                    fontTitle.setBold(true);
-                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(0, 5, fontTitle);
-                    fontDesc.setItalic(true);
-                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(6, headers[i].length(), fontDesc);
-                    break;
-                case 2:
-                    fontTitle.setBold(true);
-                    fontTitle.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(0, 10, fontTitle);
-                    fontStar.setBold(true);
-                    fontStar.setColor(IndexedColors.RED.getIndex());
-                    richText.applyFont(10, 12, fontStar);
-                    fontDesc.setItalic(true);
-                    fontDesc.setColor(IndexedColors.BLACK.getIndex());
-                    richText.applyFont(13, headers[i].length(), fontDesc);
-                    break;
-            }
+            fontTitle.setBold(true);
+            fontTitle.setColor(IndexedColors.BLACK.getIndex());
             cell.setCellValue(richText);
             cell.setCellStyle(headerStyle);
         }
@@ -562,7 +500,7 @@ public class RoleServiceImpl implements RoleService {
             cell2.setCellValue(p.getStatus() == 1 ? "Hoạt động" : "Không hoạt động");
             cell2.setCellStyle(dataStyle);
         }
-        for (int i = 0; i < headers.length - 1; i++) {
+        for (int i = 0; i < headers1.length; i++) {
             sheet1.autoSizeColumn(i);
         }
         sheet1.setColumnWidth(0, 8000);

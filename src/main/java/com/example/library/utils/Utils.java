@@ -20,6 +20,19 @@ public class Utils {
 
     public static Sort createSort(String sortBy, String sortType) {
         if (sortBy == null || sortBy.trim().isEmpty()) {
+            sortBy = "name";
+        }
+        if (!isValidSortField(sortBy)) {
+            sortBy = "name";
+        }
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortType)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        return Sort.by(direction, sortBy);
+    }
+
+    public static Sort createSortUsername(String sortBy, String sortType) {
+        if (sortBy == null || sortBy.trim().isEmpty()) {
             sortBy = "username";
         }
         if (!isValidSortField(sortBy)) {

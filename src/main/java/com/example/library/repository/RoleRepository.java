@@ -15,6 +15,10 @@ import java.util.List;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
+
+    @Query("SELECT r FROM Role r WHERE r.status = 1")
+    List<Role> findAllStatus1();
+
     boolean existsByName(String name);
 
     @Query("""

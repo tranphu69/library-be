@@ -7,7 +7,9 @@ import com.example.library.dto.response.user.UserListResponse;
 import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -17,4 +19,5 @@ public interface UserService {
     User detail(Long id);
     List<UserResponseNoRole> getListAutoSearch(String keyword, String type);
     UserListResponse getList(UserListRequest request);
+    void exportTemplateExcel(HttpServletResponse response) throws IOException;
 }
