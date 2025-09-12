@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
@@ -57,4 +58,6 @@ AND (:permissions IS NULL OR (
     List<Role> findByNameStartingWithIgnoreCase(String name);
 
     boolean existsByNameAndIdNot(String name, Long id);
+
+    Set<Role> findByNameIn(List<String> names);
 }

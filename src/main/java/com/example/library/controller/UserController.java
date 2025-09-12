@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -98,5 +99,21 @@ public class UserController {
         String fileName = "template_users.xlsx";
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
         userService.exportTemplateExcel(response);
+    }
+
+    @PostMapping("/export")
+    public void exportUsers(@RequestBody UserListRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "users_list.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        userService.exportToExcel(request, response);
+    }
+
+    @PostMapping("/import")
+    public ApiResponse<?> importRole(@RequestParam("file")MultipartFile file) {
+        userService.importFromExcel(file);
+        ApiResponse<?> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Thành công");
+        return apiResponse;
     }
 }
