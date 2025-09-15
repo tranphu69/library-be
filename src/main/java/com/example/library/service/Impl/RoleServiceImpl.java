@@ -9,8 +9,9 @@ import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.dto.response.role.RoleResponseNoPermission;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
+import com.example.library.enums.PermissionErrorCode;
+import com.example.library.enums.RoleErrorCode;
 import com.example.library.exception.AppException;
-import com.example.library.enums.ErrorCode;
 import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.RoleService;
@@ -49,16 +50,16 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role create(RoleCreateRequest request) {
         if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
-            throw new AppException(ErrorCode.ROLE_STATUS_1);
+            throw new AppException(RoleErrorCode.ROLE_STATUS_1);
         }
         if(roleRepository.existsByName(request.getName())) {
-            throw new AppException(ErrorCode.ROLE_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_EXSITED);
         }
         List<Permission> permissions = new ArrayList<>();
         if (!request.getPermissions().isEmpty()) {
             permissions = permissionRepository.findAllActiveById(request.getPermissions());
             if (permissions.size() != request.getPermissions().size()) {
-                throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+                throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
             }
         }
         Role role = new Role();
@@ -72,18 +73,18 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role update(RoleUpdateRequest request) {
         Role role = roleRepository.findById(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXSITED));
+                .orElseThrow(() -> new AppException(RoleErrorCode.ROLE_NOT_EXSITED));
         if(roleRepository.existsByNameAndIdNot(request.getName(), request.getId())) {
-            throw new AppException(ErrorCode.ROLE_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_EXSITED);
         }
         if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
-            throw new AppException(ErrorCode.ROLE_STATUS_1);
+            throw new AppException(RoleErrorCode.ROLE_STATUS_1);
         }
         List<Permission> permissions = new ArrayList<>();
         if (!request.getPermissions().isEmpty()) {
             permissions = permissionRepository.findAllActiveById(request.getPermissions());
             if (permissions.size() != request.getPermissions().size()) {
-                throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+                throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
             }
         }
         role.setName(request.getName());
@@ -97,14 +98,14 @@ public class RoleServiceImpl implements RoleService {
     public void delete(List<Long> ids) {
         List<Role> roles = roleRepository.findAllById(ids);
         if(roles.isEmpty()){
-            throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
         }
         List<Long> deleteIds = roles.stream()
                 .filter(p -> p.getStatus() == -1)
                 .map(Role::getId)
                 .toList();
         if(!deleteIds.isEmpty()){
-            throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
         }
         for(Role role : roles){
             role.setStatus(-1);
@@ -115,9 +116,9 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role detail(Long id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXSITED));
+                .orElseThrow(() -> new AppException(RoleErrorCode.ROLE_NOT_EXSITED));
         if (role.getStatus() == -1) {
-            throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
         }
         Set<Permission> activePermissions = role.getPermissions()
                 .stream()
@@ -149,7 +150,7 @@ public class RoleServiceImpl implements RoleService {
         List<Long> arrNumber = Utils.convertToLongList(request.getPermissions());
         List<Permission> permissions = permissionRepository.findAllActiveById(arrNumber);
         if (permissions.size() != arrNumber.size()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
         }
         Page<Role> rolePage = roleRepository.findRolesWithFilter(
                 request.getName(),
@@ -329,7 +330,7 @@ public class RoleServiceImpl implements RoleService {
         List<Long> arrNumber = Utils.convertToLongList(request.getPermissions());
         List<Permission> permissions = permissionRepository.findAllActiveById(arrNumber);
         if (permissions.size() != arrNumber.size()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
         }
         Page<Role> rolePage = roleRepository.findRolesWithFilter(
                 request.getName(),
@@ -534,13 +535,13 @@ public class RoleServiceImpl implements RoleService {
                 Set<Permission> permissions = permissionRepository.findByNameIn(permissionArr);
                 Set<ConstraintViolation<RoleCreateRequest>> violations = validator.validate(request);
                 if (!violations.isEmpty()) {
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
                 }
                 if (!excelNames.add(request.getName())){
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
                 }
                 if (roleRepository.existsByName(request.getName())){
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
                 }
                 Role role = new Role();
                 role.setName(request.getName());
@@ -552,7 +553,7 @@ public class RoleServiceImpl implements RoleService {
             roleRepository.saveAll(roles);
             workbook.close();
         } catch (IOException e) {
-            throw new AppException(ErrorCode.NOT_READ_FILE);
+            throw new AppException(RoleErrorCode.ROLE_NOT_READ_FILE);
         }
     }
 

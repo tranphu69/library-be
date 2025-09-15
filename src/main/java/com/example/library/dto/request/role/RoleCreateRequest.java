@@ -5,14 +5,14 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 public class RoleCreateRequest {
-    @NotBlank(message = "NAME_REQUEST")
-    @Size(max = 50, message = "NAME_MAX_LENGTH")
+    @NotBlank(message = "ROLE_NAME_REQUEST")
+    @Size(max = 50, message = "ROLE_NAME_MAX_LENGTH")
     private String name;
-    @Size(max = 255, message = "DESCRIPTION_MAX_LENGTH")
+    @Size(max = 255, message = "ROLE_DESCRIPTION_MAX_LENGTH")
     private String description;
-    @NotNull(message = "STATUS_REQUEST")
-    @Min(value = 0, message = "INVALID")
-    @Max(value = 1, message = "INVALID")
+    @NotNull(message = "ROLE_STATUS_REQUEST")
+    @Min(value = 0, message = "ROLE_INVALID_STATUS")
+    @Max(value = 1, message = "ROLE_INVALID_STATUS")
     private Integer status;
     private List<Long> permissions;
 
