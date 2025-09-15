@@ -7,6 +7,7 @@ import com.example.library.dto.response.Permission.PermissionListResponse;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
+import com.example.library.enums.PermissionErrorCode;
 import com.example.library.exception.AppException;
 import com.example.library.enums.ErrorCode;
 import com.example.library.repository.PermissionRepository;
@@ -51,7 +52,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission create(PermissionCreateRequest request) {
         if(permissionRepository.existsByName(request.getName())){
-            throw new AppException(ErrorCode.PERMISSION_EXSITED);
+            throw new AppException(PermissionErrorCode.PERMISSION_EXSITED);
         }
         Permission permission = new Permission();
         permission.setName(request.getName());

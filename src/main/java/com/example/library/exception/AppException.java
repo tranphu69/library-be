@@ -1,20 +1,18 @@
 package com.example.library.exception;
 
-import com.example.library.enums.ErrorCode;
-
 public class AppException extends RuntimeException{
-    private ErrorCode errorCode;
+    private BaseErrorCode errorCode;
 
-    public AppException(ErrorCode errorCode) {
+    public AppException(BaseErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
+    public BaseErrorCode getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(ErrorCode errorCode) {
+    public void setErrorCode(BaseErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 }
