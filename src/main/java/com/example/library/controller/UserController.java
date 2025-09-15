@@ -9,7 +9,7 @@ import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;
-import com.example.library.exception.ErrorCode;
+import com.example.library.enums.ErrorCode;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;

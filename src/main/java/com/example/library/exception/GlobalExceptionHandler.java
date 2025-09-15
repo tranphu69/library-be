@@ -1,6 +1,7 @@
 package com.example.library.exception;
 
 import com.example.library.dto.response.ApiResponse;
+import com.example.library.enums.ErrorCode;
 import jakarta.validation.ConstraintViolation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

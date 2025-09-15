@@ -1,4 +1,4 @@
-package com.example.library.exception;
+package com.example.library.enums;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

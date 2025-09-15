@@ -1,20 +1,17 @@
 package com.example.library.service.Impl;
 
-import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.user.UserCreateRequest;
 import com.example.library.dto.request.user.UserListRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
-import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.dto.response.role.RoleResponseNoPermission;
 import com.example.library.dto.response.user.UserListResponse;
 import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
-import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;
-import com.example.library.exception.ErrorCode;
+import com.example.library.enums.ErrorCode;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
