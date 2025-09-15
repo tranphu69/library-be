@@ -1,6 +1,7 @@
 package com.example.library.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class Permission {
     private String name;
     private String description;
     private Integer status;
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp

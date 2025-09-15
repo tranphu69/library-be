@@ -9,7 +9,6 @@ import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.enums.PermissionErrorCode;
 import com.example.library.exception.AppException;
-import com.example.library.enums.ErrorCode;
 import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
 import com.example.library.service.PermissionService;
@@ -65,9 +64,9 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional
     public Permission update(PermissionUpdateRequest request) {
         Permission permission = permissionRepository.findById(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXSITED));
-        if(permissionRepository.existsByNameAndIdNot(request.getName(), request.getId())){
-            throw new AppException(ErrorCode.PERMISSION_EXSITED);
+                .orElseThrow(() -> new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED));
+        if(permissionRepository.existsByNameAndId(request.getName(), request.getId())){
+            throw new AppException(PermissionErrorCode.PERMISSION_EXSITED);
         }
         permission.setName(request.getName());
         permission.setDescription(request.getDescription());
@@ -258,13 +257,13 @@ public class PermissionServiceImpl implements PermissionService {
                 request.setStatus(status);
                 Set<ConstraintViolation<PermissionCreateRequest>> violations = validator.validate(request);
                 if (!violations.isEmpty()) {
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
                 if (!excelNames.add(request.getName())){
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
                 if (permissionRepository.existsByName(request.getName())){
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
                 Permission permission = new Permission();
                 permission.setName(request.getName());
@@ -275,7 +274,7 @@ public class PermissionServiceImpl implements PermissionService {
             permissionRepository.saveAll(permissions);
             workbook.close();
         } catch (IOException e) {
-            throw new AppException(ErrorCode.NOT_READ_FILE);
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_READ_FILE);
         }
     }
 
@@ -284,14 +283,14 @@ public class PermissionServiceImpl implements PermissionService {
     public void delete(List<Long> ids) {
         List<Permission> permissions = permissionRepository.findAllById(ids);
         if (permissions.isEmpty()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
         }
         List<Long> deletedIds = permissions.stream()
                 .filter(p -> p.getStatus() == -1)
                 .map(Permission::getId)
                 .toList();
         if (!deletedIds.isEmpty()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
         }
         for (Permission permission : permissions) {
             permission.setStatus(-1);
@@ -312,9 +311,9 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission detail(Long id) {
         Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXSITED));
+                .orElseThrow(() -> new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED));
         if (permission.getStatus() == -1) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXSITED);
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_EXSITED);
         }
         return permission;
     }

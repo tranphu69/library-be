@@ -35,6 +35,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     Set<Permission> findByNameIn(List<String> names);
 
-    boolean existsByNameAndIdNot(String name, Long id);
+    boolean existsByNameAndId(String name, Long id);
     List<Permission> findByNameStartingWithIgnoreCase(String name);
 }

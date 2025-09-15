@@ -10,9 +10,12 @@ public enum PermissionErrorCode implements BaseErrorCode {
     PERMISSION_NAME_MAX_LENGTH(1003, "Trường tên không vượt quá 50 kí tự!", HttpStatus.BAD_REQUEST),
     PERMISSION_DESCRIPTION_MAX_LENGTH(1004, "Trường mô tả không vượt quá 255 kí tự!", HttpStatus.BAD_REQUEST),
     PERMISSION_STATUS_REQUEST(1005, "Trường trạng thái không được bỏ trống!", HttpStatus.BAD_REQUEST),
-    PERMISSION_INVALID_STATUS(1006, "Giá trị trường trạng thái không hợp lệ!", HttpStatus.BAD_REQUEST)
+    PERMISSION_INVALID_STATUS(1006, "Giá trị trường trạng thái không hợp lệ!", HttpStatus.BAD_REQUEST),
+    PERMISSION_NOT_EXSITED(1007, "Permission không tồn tại!", HttpStatus.BAD_REQUEST),
+    PERMISSION_INVALID(1008, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
+    PERMISSION_ERROR_FILE(1009, "File tải lên bị lỗi!", HttpStatus.BAD_REQUEST),
+    PERMISSION_NOT_READ_FILE(1010, "Không thể đọc được file!", HttpStatus.BAD_REQUEST),
     ;
-
 
     private final int code;
     private final String message;

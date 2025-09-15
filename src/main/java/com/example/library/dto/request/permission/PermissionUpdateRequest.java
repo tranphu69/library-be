@@ -4,14 +4,14 @@ import jakarta.validation.constraints.*;
 
 public class PermissionUpdateRequest {
     private Long id;
-    @NotBlank(message = "NAME_REQUEST")
-    @Size(max = 50, message = "NAME_MAX_LENGTH")
+    @NotBlank(message = "PERMISSION_NAME_REQUEST")
+    @Size(max = 50, message = "PERMISSION_NAME_MAX_LENGTH")
     private String name;
-    @Size(max = 255, message = "DESCRIPTION_MAX_LENGTH")
+    @Size(max = 255, message = "PERMISSION_DESCRIPTION_MAX_LENGTH")
     private String description;
-    @NotNull(message = "STATUS_REQUEST")
-    @Min(value = 0, message = "INVALID")
-    @Max(value = 1, message = "INVALID")
+    @NotNull(message = "PERMISSION_STATUS_REQUEST")
+    @Min(value = 0, message = "PERMISSION_INVALID_STATUS")
+    @Max(value = 1, message = "PERMISSION_INVALID_STATUS")
     private Integer status;
 
     public Integer getStatus() {
