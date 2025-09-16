@@ -16,7 +16,8 @@ public enum UserErrorCode implements BaseErrorCode {
     USER_NOT_EXSITED(1028, "User không đã tồn tại!", HttpStatus.BAD_REQUEST),
     USER_INVALID(1029, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
     USER_ERROR_FILE(1030, "File tải lên đang lỗi!", HttpStatus.BAD_REQUEST),
-    USER_NOT_READ_FILE(1019, "Không thể đọc được file!", HttpStatus.BAD_REQUEST)
+    USER_NOT_READ_FILE(1019, "Không thể đọc được file!", HttpStatus.BAD_REQUEST),
+    USER_ERROR_TYPE(1031, "Trường tìm kiếm không hợp lệ", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

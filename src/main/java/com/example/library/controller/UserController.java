@@ -8,6 +8,7 @@ import com.example.library.dto.response.user.UserListResponse;
 import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
+import com.example.library.enums.UserErrorCode;
 import com.example.library.exception.AppException;
 import com.example.library.enums.ErrorCode;
 import com.example.library.repository.UserRepository;
@@ -75,7 +76,7 @@ public class UserController {
             @RequestParam("type") String type
     ) {
         if(!"email".equalsIgnoreCase(type) && !"username".equalsIgnoreCase(type)) {
-            throw new AppException(ErrorCode.ERROR_TYPE);
+            throw new AppException(UserErrorCode.USER_ERROR_TYPE);
         }
         List<UserResponseNoRole> results = userService.getListAutoSearch(keyword, type);
         ApiResponse<List<UserResponseNoRole>> apiResponse = new ApiResponse<>();
