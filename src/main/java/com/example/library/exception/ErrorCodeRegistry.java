@@ -1,5 +1,6 @@
 package com.example.library.exception;
 
+import com.example.library.enums.AuthErrorCode;
 import com.example.library.enums.PermissionErrorCode;
 import com.example.library.enums.RoleErrorCode;
 import com.example.library.enums.UserErrorCode;
@@ -18,6 +19,7 @@ public class ErrorCodeRegistry {
         register(PermissionErrorCode.values());
         register(RoleErrorCode.values());
         register(UserErrorCode.values());
+        register(AuthErrorCode.values());
     }
 
     private void register(BaseErrorCode[] values) {

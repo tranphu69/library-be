@@ -1,4 +1,4 @@
-package com.example.library.dto.response.Permission;
+package com.example.library.dto.response.permission;
 
 public class PermissionNoStatus {
     private Long id;

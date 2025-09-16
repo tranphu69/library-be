@@ -1,7 +1,6 @@
 package com.example.library.dto.response.role;
 
-import com.example.library.dto.response.Permission.PermissionNoStatus;
-import com.example.library.entity.Permission;
+import com.example.library.dto.response.permission.PermissionNoStatus;
 
 import java.util.Set;
 
