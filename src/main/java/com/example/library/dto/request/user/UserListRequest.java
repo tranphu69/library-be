@@ -6,19 +6,19 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserListRequest {
-    @Size(max = 50, message = "USERNAME_MAX_LENGTH")
+    @Size(max = 50, message = "USER_USERNAME_MAX_LENGTH")
     private String email;
-    @Size(max = 50, message = "EMAIL_MAX_LENGTH")
+    @Size(max = 50, message = "USER_EMAIL_MAX_LENGTH")
     private String username;
-    @Min(value = 0, message = "INVALID")
-    @Max(value = 1, message = "INVALID")
+    @Min(value = 0, message = "USER_INVALID")
+    @Max(value = 1, message = "USER_INVALID")
     private Integer isActive;
-    @Min(value = 0, message = "INVALID")
+    @Min(value = 0, message = "USER_INVALID")
     private Integer page;
-    @Min(value = 1, message = "INVALID")
+    @Min(value = 1, message = "USER_INVALID")
     private Integer size;
     private String sortBy;
-    @Pattern(regexp = "^(ASC|DESC)$", message = "INVALID")
+    @Pattern(regexp = "^(ASC|DESC)$", message = "USER_INVALID")
     private String sortType;
     private String roles;
 

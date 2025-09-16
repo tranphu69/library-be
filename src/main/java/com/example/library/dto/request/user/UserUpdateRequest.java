@@ -7,11 +7,11 @@ import java.util.List;
 
 public class UserUpdateRequest {
     private Long id;
-    @NotBlank(message = "USERNAME_REQUEST")
-    @Size(max = 50, message = "USERNAME_MAX_LENGTH")
+    @NotBlank(message = "USER_USERNAME_REQUEST")
+    @Size(max = 50, message = "USER_USERNAME_MAX_LENGTH")
     private String username;
-    @NotBlank(message = "EMAIL_REQUEST")
-    @Size(max = 50, message = "EMAIL_MAX_LENGTH")
+    @NotBlank(message = "USER_EMAIL_REQUEST")
+    @Size(max = 50, message = "USER_EMAIL_MAX_LENGTH")
     private String email;
     private Integer isActive;
     private List<Long> roles;

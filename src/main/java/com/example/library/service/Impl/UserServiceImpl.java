@@ -10,8 +10,9 @@ import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
+import com.example.library.enums.RoleErrorCode;
+import com.example.library.enums.UserErrorCode;
 import com.example.library.exception.AppException;
-import com.example.library.enums.ErrorCode;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
@@ -53,10 +54,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(UserCreateRequest request) {
         if(userRepository.existsByEmail(request.getEmail().toLowerCase())) {
-            throw new AppException(ErrorCode.EMAIL_EXSITED);
+            throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
         }
         if(userRepository.existsByUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_EXSITED);
+            throw new AppException(UserErrorCode.USER_USERNAME_EXSITED);
         }
         User user = new User();
         user.setEmail(request.getEmail());
@@ -67,14 +68,14 @@ public class UserServiceImpl implements UserService {
         if(request.getRoles().isEmpty()){
             roles = roleRepository.findByName("USER");
             if (roles.isEmpty()) {
-                throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+                throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
             } else {
                 user.setRoles(new HashSet<>(roles));
             }
         } else {
             roles = roleRepository.findAllActiveById(request.getRoles());
             if (roles.size() != request.getRoles().size()){
-                throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+                throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
             }
             user.setRoles(new HashSet<>(roles));
         }
@@ -84,12 +85,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(UserUpdateRequest request) {
         User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXSITED));
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_EXSITED));
         if (userRepository.existsByEmailAndIdNot(request.getEmail(), request.getId())) {
-            throw new AppException(ErrorCode.EMAIL_EXSITED);
+            throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
         }
         if (userRepository.existsByUsernameAndIdNot(request.getUsername(), request.getId())) {
-            throw new AppException(ErrorCode.USERNAME_EXSITED);
+            throw new AppException(UserErrorCode.USER_USERNAME_EXSITED);
         }
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
@@ -98,14 +99,14 @@ public class UserServiceImpl implements UserService {
         if(request.getRoles().isEmpty()){
             roles = roleRepository.findByName("USER");
             if (roles.isEmpty()) {
-                throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+                throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
             } else {
                 user.setRoles(new HashSet<>(roles));
             }
         } else {
             roles = roleRepository.findAllActiveById(request.getRoles());
             if (roles.size() != request.getRoles().size()){
-                throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+                throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
             }
             user.setRoles(new HashSet<>(roles));
         }
@@ -116,14 +117,14 @@ public class UserServiceImpl implements UserService {
     public void delete(List<Long> ids) {
         List<User> users = userRepository.findAllById(ids);
         if(users.isEmpty()){
-            throw new AppException(ErrorCode.USER_NOT_EXSITED);
+            throw new AppException(UserErrorCode.USER_NOT_EXSITED);
         }
         List<Long> deleteIds = users.stream()
                 .filter(p -> p.getIsActive() == -1)
                 .map(User::getId)
                 .toList();
         if(!deleteIds.isEmpty()){
-            throw new AppException(ErrorCode.USER_NOT_EXSITED);
+            throw new AppException(UserErrorCode.USER_NOT_EXSITED);
         }
         for (User user : users) {
             user.setIsActive(-1);
@@ -134,9 +135,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User detail(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXSITED));
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_EXSITED));
         if(user.getIsActive() == -1){
-            throw new AppException(ErrorCode.USER_NOT_EXSITED);
+            throw new AppException(UserErrorCode.USER_NOT_EXSITED);
         }
         Set<Role> activeRole = user.getRoles()
                 .stream()
@@ -173,7 +174,7 @@ public class UserServiceImpl implements UserService {
         List<Long> arrNumber = Utils.convertToLongList(request.getRoles());
         List<Role> roles = roleRepository.findAllActiveById(arrNumber);
         if (roles.size() != arrNumber.size()) {
-            throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
         }
         Page<User> userPage = userRepository.findUsersWithFilter(
                 request.getEmail(),
@@ -358,7 +359,7 @@ public class UserServiceImpl implements UserService {
         List<Long> arrNumber = Utils.convertToLongList(request.getRoles());
         List<Role> roles = roleRepository.findAllActiveById(arrNumber);
         if (roles.size() != arrNumber.size()) {
-            throw new AppException(ErrorCode.ROLE_NOT_EXSITED);
+            throw new AppException(RoleErrorCode.ROLE_NOT_EXSITED);
         }
         Page<User> userPage = userRepository.findUsersWithFilter(
                 request.getEmail(),
@@ -568,19 +569,19 @@ public class UserServiceImpl implements UserService {
                 Set<Role> roles = roleRepository.findByNameIn(roleArr);
                 Set<ConstraintViolation<UserCreateRequest>> violations = validator.validate(request);
                 if (!violations.isEmpty()) {
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
                 }
                 if (!excelUsernames.add(request.getUsername())){
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
                 }
                 if (!excelEmails.add(request.getEmail())){
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
                 }
                 if (userRepository.existsByUsername(request.getUsername())) {
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
                 }
                 if (userRepository.existsByEmail(request.getEmail())) {
-                    throw new AppException(ErrorCode.ERROR_FILE);
+                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
                 }
                 User user = new User();
                 user.setEmail(request.getEmail());
@@ -593,7 +594,7 @@ public class UserServiceImpl implements UserService {
             userRepository.saveAll(users);
             workbook.close();
         } catch (IOException e) {
-            throw new AppException(ErrorCode.NOT_READ_FILE);
+            throw new AppException(UserErrorCode.USER_NOT_READ_FILE);
         }
     }
 

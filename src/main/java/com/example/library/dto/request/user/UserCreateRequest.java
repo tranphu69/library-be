@@ -6,14 +6,14 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public class UserCreateRequest {
-    @NotBlank(message = "USERNAME_REQUEST")
-    @Size(max = 50, message = "USERNAME_MAX_LENGTH")
+    @NotBlank(message = "USER_USERNAME_REQUEST")
+    @Size(max = 50, message = "USER_USERNAME_MAX_LENGTH")
     private String username;
-    @NotBlank(message = "EMAIL_REQUEST")
-    @Size(max = 50, message = "EMAIL_MAX_LENGTH")
+    @NotBlank(message = "USER_EMAIL_REQUEST")
+    @Size(max = 50, message = "USER_EMAIL_MAX_LENGTH")
     private String email;
-    @NotBlank(message = "PASSWORD_REQUEST")
-    @Size(min = 8, message = "PASSWORD_MIN_LENGTH")
+    @NotBlank(message = "USER_PASSWORD_REQUEST")
+    @Size(min = 8, message = "USER_PASSWORD_MIN_LENGTH")
     private String password;
     private Integer isActive;
     private List<Long> roles;
