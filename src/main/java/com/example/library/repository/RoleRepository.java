@@ -57,7 +57,7 @@ AND (:permissions IS NULL OR (
 
     List<Role> findByNameStartingWithIgnoreCase(String name);
 
-    boolean existsByNameAndIdNot(String name, Long id);
+    boolean existsByNameAndId(String name, Long id);
 
     Set<Role> findByNameIn(List<String> names);
 }

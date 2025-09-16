@@ -3,6 +3,7 @@ package com.example.library.service.Impl;
 import com.example.library.dto.request.role.RoleCreateRequest;
 import com.example.library.dto.request.role.RoleListRequest;
 import com.example.library.dto.request.role.RoleUpdateRequest;
+import com.example.library.dto.response.Permission.PermissionNoStatus;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
@@ -74,7 +75,7 @@ public class RoleServiceImpl implements RoleService {
     public Role update(RoleUpdateRequest request) {
         Role role = roleRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(RoleErrorCode.ROLE_NOT_EXSITED));
-        if(roleRepository.existsByNameAndIdNot(request.getName(), request.getId())) {
+        if(roleRepository.existsByNameAndId(request.getName(), request.getId())) {
             throw new AppException(RoleErrorCode.ROLE_EXSITED);
         }
         if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
@@ -439,7 +440,7 @@ public class RoleServiceImpl implements RoleService {
             Cell cell3 = row.createCell(3);
             cell3.setCellValue(r.getPermissions()
                     .stream()
-                    .map(Permission::getName)
+                    .map(PermissionNoStatus::getName)
                     .collect(Collectors.joining(", ")));
             cell3.setCellStyle(dataStyle);
         }
@@ -566,9 +567,14 @@ public class RoleServiceImpl implements RoleService {
                     response.setName(role.getName());
                     response.setDescription(role.getDescription());
                     response.setStatus(role.getStatus());
-                    Set<Permission> activePermissions = role.getPermissions()
+                    Set<PermissionNoStatus> activePermissions = role.getPermissions()
                             .stream()
                             .filter(p -> p.getStatus() != -1 && p.getStatus() != 0)
+                            .map(p -> new PermissionNoStatus(
+                                    p.getId(),
+                                    p.getName(),
+                                    p.getDescription()
+                            ))
                             .collect(Collectors.toSet());
                     response.setPermissions(activePermissions);
                     return response;
