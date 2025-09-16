@@ -422,6 +422,8 @@ public class PermissionServiceImpl implements PermissionService {
                     response.setName(permission.getName());
                     response.setDescription(permission.getDescription());
                     response.setStatus(permission.getStatus());
+                    response.setCreatedAt(permission.getCreatedAt());
+                    response.setUpdatedAt(permission.getUpdatedAt());
                     return response;
                 })
                 .collect(Collectors.toList());

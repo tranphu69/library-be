@@ -1,10 +1,14 @@
 package com.example.library.dto.response.Permission;
 
+import java.time.LocalDateTime;
+
 public class PermissionResponse {
     private Long id;
     private String name;
     private String description;
     private Integer status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -36,5 +40,21 @@ public class PermissionResponse {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
