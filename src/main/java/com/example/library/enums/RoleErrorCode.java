@@ -14,7 +14,7 @@ public enum RoleErrorCode implements BaseErrorCode {
     ROLE_EXSITED(1017, "Role đã tồn tại!", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXSITED(1018, "Role không tồn tại!", HttpStatus.BAD_REQUEST),
     ROLE_ERROR_FILE(1019, "File tải lên bị lỗi!", HttpStatus.BAD_REQUEST),
-    ROLE_NOT_READ_FILE(1019, "Không thể đọc được file!", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_READ_FILE(1020, "Không thể đọc được file!", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;
