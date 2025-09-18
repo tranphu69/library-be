@@ -11,6 +11,7 @@ import com.example.library.exception.AppException;
 import com.example.library.repository.UserRepository;
 import com.example.library.security.JwtTokenProvider;
 import com.example.library.service.AuthService;
+import com.example.library.service.auth.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +29,8 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -42,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
                     .map(Role::getName)
                     .toList();
             String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail(), names);
-            String refreshToken = "";
+            String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
             UserResponseListRole profile = new UserResponseListRole();
             profile.setEmail(user.getEmail());
             profile.setId(user.getId());
