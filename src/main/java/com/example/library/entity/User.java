@@ -1,6 +1,9 @@
 package com.example.library.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,16 +18,26 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String username;
+    @NotBlank
+    @Email
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String email;
+    @NotBlank
+    @Size(min = 8, max = 255)
+    @Column(nullable = false, length = 255)
     private String password;
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private Integer isActive;
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

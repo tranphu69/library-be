@@ -38,15 +38,15 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new AppException(UserErrorCode.USER_USERNAME_EXSITED));
-            String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail());
+            List<String> names = user.getRoles().stream()
+                    .map(Role::getName)
+                    .toList();
+            String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail(), names);
             String refreshToken = "";
             UserResponseListRole profile = new UserResponseListRole();
             profile.setEmail(user.getEmail());
             profile.setId(user.getId());
             profile.setUsername(user.getUsername());
-            List<String> names = user.getRoles().stream()
-                            .map(Role::getName)
-                                    .toList();
             profile.setRoles(names);
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setAccessToken(accessToken);

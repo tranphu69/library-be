@@ -12,8 +12,11 @@ public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 50)
     private String name;
+    @Column(length = 255)
     private String description;
+    @Column(nullable = false)
     private Integer status;
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

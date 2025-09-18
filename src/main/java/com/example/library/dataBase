@@ -42,11 +42,9 @@ CREATE TABLE role_permissions (
 CREATE TABLE refresh_tokens (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    jti VARCHAR(255) UNIQUE NOT NULL,
     token VARCHAR(512) NOT NULL,
     expired_at TIMESTAMP NOT NULL,
     revoked BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE TABLE log_actions (

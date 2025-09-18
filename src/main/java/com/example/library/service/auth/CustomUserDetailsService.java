@@ -1,4 +1,4 @@
-package com.example.library.service;
+package com.example.library.service.auth;
 
 import com.example.library.entity.User;
 import com.example.library.enums.UserErrorCode;
