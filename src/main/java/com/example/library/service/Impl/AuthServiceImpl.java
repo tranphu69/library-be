@@ -45,7 +45,8 @@ public class AuthServiceImpl implements AuthService {
                     .map(Role::getName)
                     .toList();
             String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail(), names);
-            String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
+            //String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
+            String refreshToken = "";
             UserResponseListRole profile = new UserResponseListRole();
             profile.setEmail(user.getEmail());
             profile.setId(user.getId());
