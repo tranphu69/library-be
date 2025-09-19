@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +50,7 @@ public class RoleServiceImpl implements RoleService {
     private PermissionRepository permissionRepository;
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
     public Role create(RoleCreateRequest request) {
         if(request.getStatus() == 1 && request.getPermissions().isEmpty()) {
             throw new AppException(RoleErrorCode.ROLE_STATUS_1);
@@ -72,6 +74,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_UPDATE')")
     public Role update(RoleUpdateRequest request) {
         Role role = roleRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(RoleErrorCode.ROLE_NOT_EXSITED));
@@ -96,6 +99,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_DELETE')")
     public void delete(List<Long> ids) {
         List<Role> roles = roleRepository.findAllById(ids);
         if(roles.isEmpty()){
@@ -115,6 +119,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_SEARCH')")
     public Role detail(Long id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new AppException(RoleErrorCode.ROLE_NOT_EXSITED));
@@ -130,6 +135,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_SEARCH')")
     public List<RoleResponseNoPermission> getListAutoSearch(String keyword) {
         String normalizedQuery = keyword.trim();
         List<Role> roles = roleRepository.findByNameStartingWithIgnoreCase(normalizedQuery);
@@ -145,6 +151,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_SEARCH')")
     public RoleListResponse getList(RoleListRequest request) {
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
@@ -170,6 +177,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_SEARCH')")
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Thông tin danh sách");
@@ -325,6 +333,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_SEARCH')")
     public void exportToExcel(RoleListRequest request, HttpServletResponse response) throws IOException {
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
@@ -513,6 +522,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream()){
             Workbook workbook = new XSSFWorkbook(is);

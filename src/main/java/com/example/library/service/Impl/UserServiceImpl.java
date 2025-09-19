@@ -32,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public User create(UserCreateRequest request) {
         if(userRepository.existsByEmail(request.getEmail().toLowerCase())) {
             throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
@@ -89,6 +91,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     public User update(UserUpdateRequest request) {
         User user = userRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_EXSITED));
@@ -120,6 +123,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public void delete(List<Long> ids) {
         List<User> users = userRepository.findAllById(ids);
         if(users.isEmpty()){
@@ -139,6 +143,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public User detail(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_EXSITED));
@@ -154,6 +159,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public List<UserResponseNoRole> getListAutoSearch(String keyword, String type) {
         List<User> users = List.of();
         String normalizedQuery = keyword.trim();
@@ -174,6 +180,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public UserListResponse getList(UserListRequest request) {
         Sort sort = Utils.createSortUsername(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
@@ -200,6 +207,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Thông tin danh sách");
@@ -359,6 +367,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public void exportToExcel(UserListRequest request, HttpServletResponse response) throws IOException {
         Sort sort = Utils.createSortUsername(request.getSortBy(), request.getSortType());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
@@ -550,6 +559,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream()) {
             Workbook workbook = new XSSFWorkbook(is);
