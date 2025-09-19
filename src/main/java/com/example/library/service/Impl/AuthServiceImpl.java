@@ -3,6 +3,7 @@ package com.example.library.service.Impl;
 import com.example.library.dto.request.auth.LoginRequest;
 import com.example.library.dto.response.auth.LoginResponse;
 import com.example.library.dto.response.user.UserResponseListRole;
+import com.example.library.entity.RefreshToken;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.enums.AuthErrorCode;
@@ -45,8 +46,7 @@ public class AuthServiceImpl implements AuthService {
                     .map(Role::getName)
                     .toList();
             String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail(), names);
-            //String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
-            String refreshToken = "";
+            String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
             UserResponseListRole profile = new UserResponseListRole();
             profile.setEmail(user.getEmail());
             profile.setId(user.getId());
@@ -61,5 +61,41 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new AppException(AuthErrorCode.AUTH_ERROR_CODE);
         }
+    }
+
+    @Override
+    public void logout(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        refreshTokenService.deleteByUser(user);
+    }
+
+    @Override
+    public LoginResponse refreshToken(String request) {
+        RefreshToken token = refreshTokenService.findByToken(request)
+                .orElseThrow(() -> new AppException(AuthErrorCode.AUTH_INVALID_TOKEN));
+        if(refreshTokenService.isTokenExpired(token)){
+            refreshTokenService.deleteByToken(request);
+            throw new AppException(AuthErrorCode.AUTH_EXPIRED_TOKEN);
+        }
+        List<String> names = token.getUser().getRoles().stream()
+                .map(Role::getName)
+                .toList();
+        String accessToken = jwtTokenProvider.generateAccessToken(token.getUser().getEmail(), names);
+        String newRefreshToken = null;
+        if (refreshTokenService.isTokenExpiringSoon(token, 7)) {
+            newRefreshToken = refreshTokenService.createRefreshToken(token.getUser()).getToken();
+            refreshTokenService.deleteByToken(request);
+        }
+        UserResponseListRole profile = new UserResponseListRole();
+        profile.setEmail(token.getUser().getEmail());
+        profile.setId(token.getUser().getId());
+        profile.setUsername(token.getUser().getUsername());
+        profile.setRoles(names);
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken(accessToken);
+        loginResponse.setRefreshToken(newRefreshToken != null ? newRefreshToken : request);
+        loginResponse.setTokenType("Bearer");
+        loginResponse.setUser(profile);
+        return loginResponse;
     }
 }

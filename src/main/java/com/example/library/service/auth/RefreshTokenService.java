@@ -6,9 +6,12 @@ import com.example.library.repository.RefreshTokenRepository;
 import com.example.library.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Service
 public class RefreshTokenService {
@@ -33,5 +36,28 @@ public class RefreshTokenService {
         refreshToken.setExpiredAt(LocalDateTime.now().plus(refreshTokenDurationMs, ChronoUnit.MILLIS));
         refreshToken.setRevoked(false);
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    public Optional<RefreshToken> findByToken(String token) {
+        return refreshTokenRepository.findByToken(token);
+    }
+
+    public boolean isTokenExpired(RefreshToken token) {
+        return token.getExpiredAt().isBefore(LocalDateTime.now());
+    }
+
+    @Transactional
+    public void deleteByUser(User user) {
+        refreshTokenRepository.deleteByUser(user);
+    }
+
+    public boolean isTokenExpiringSoon(RefreshToken token, long days) {
+        LocalDateTime expiryThreshold = LocalDateTime.now().plusSeconds(days * 24 * 60 * 60);
+        return token.getExpiredAt().isBefore(expiryThreshold);
+    }
+
+    @Transactional
+    public void deleteByToken(String token){
+        refreshTokenRepository.deleteByToken(token);
     }
 }

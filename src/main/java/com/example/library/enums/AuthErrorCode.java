@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatusCode;
 
 public enum AuthErrorCode implements BaseErrorCode {
     AUTH_ERROR_CODE(1034, "Thông tin đăng nhập không chính xác!",HttpStatus.BAD_REQUEST),
+    AUTH_INVALID_TOKEN(1035, "Token không hợp lệ!",HttpStatus.BAD_REQUEST),
+    AUTH_EXPIRED_TOKEN(1036, "Mã thông báo làm mới đã hết hạn!",HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

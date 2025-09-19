@@ -5,4 +5,6 @@ import com.example.library.dto.response.auth.LoginResponse;
 
 public interface AuthService {
     LoginResponse login(LoginRequest request);
+    void logout(String email);
+    LoginResponse refreshToken(String request);
 }
