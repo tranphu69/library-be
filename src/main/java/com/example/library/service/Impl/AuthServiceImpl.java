@@ -3,6 +3,7 @@ package com.example.library.service.Impl;
 import com.example.library.dto.request.auth.LoginRequest;
 import com.example.library.dto.response.auth.LoginResponse;
 import com.example.library.dto.response.user.UserResponseListRole;
+import com.example.library.entity.Permission;
 import com.example.library.entity.RefreshToken;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
@@ -42,16 +43,22 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new AppException(UserErrorCode.USER_USERNAME_EXSITED));
-            List<String> names = user.getRoles().stream()
-                    .map(Role::getName)
+            List<String> roles = user.getRoles().stream()
+                    .map(role -> "ROLE_" + role.getName())
                     .toList();
-            String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail(), names);
+            List<String> permissions = user.getRoles().stream()
+                    .flatMap(role -> role.getPermissions().stream())
+                    .map(Permission::getName)
+                    .distinct()
+                    .toList();
+            String accessToken = jwtTokenProvider.generateAccessToken(request.getEmail(), roles);
             String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
             UserResponseListRole profile = new UserResponseListRole();
             profile.setEmail(user.getEmail());
             profile.setId(user.getId());
             profile.setUsername(user.getUsername());
-            profile.setRoles(names);
+            profile.setRoles(roles);
+            profile.setPermissions(permissions);
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setAccessToken(accessToken);
             loginResponse.setRefreshToken(refreshToken);
@@ -77,10 +84,15 @@ public class AuthServiceImpl implements AuthService {
             refreshTokenService.deleteByToken(request);
             throw new AppException(AuthErrorCode.AUTH_EXPIRED_TOKEN);
         }
-        List<String> names = token.getUser().getRoles().stream()
-                .map(Role::getName)
+        List<String> roles = token.getUser().getRoles().stream()
+                .map(role -> "ROLE_" + role.getName())
                 .toList();
-        String accessToken = jwtTokenProvider.generateAccessToken(token.getUser().getEmail(), names);
+        List<String> permissions = token.getUser().getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(Permission::getName)
+                .distinct()
+                .toList();
+        String accessToken = jwtTokenProvider.generateAccessToken(token.getUser().getEmail(), roles);
         String newRefreshToken = null;
         if (refreshTokenService.isTokenExpiringSoon(token, 7)) {
             newRefreshToken = refreshTokenService.createRefreshToken(token.getUser()).getToken();
@@ -90,7 +102,8 @@ public class AuthServiceImpl implements AuthService {
         profile.setEmail(token.getUser().getEmail());
         profile.setId(token.getUser().getId());
         profile.setUsername(token.getUser().getUsername());
-        profile.setRoles(names);
+        profile.setRoles(roles);
+        profile.setPermissions(permissions);
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken(accessToken);
         loginResponse.setRefreshToken(newRefreshToken != null ? newRefreshToken : request);

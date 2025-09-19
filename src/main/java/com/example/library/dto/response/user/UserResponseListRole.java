@@ -7,6 +7,15 @@ public class UserResponseListRole {
     private String username;
     private String email;
     private List<String> roles;
+    private List<String> permissions;
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
+    }
 
     public Long getId() {
         return id;
