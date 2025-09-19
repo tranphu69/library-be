@@ -5,7 +5,6 @@ import com.example.library.dto.request.auth.RefreshTokenRequest;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.auth.LoginResponse;
 import com.example.library.service.AuthService;
-import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;

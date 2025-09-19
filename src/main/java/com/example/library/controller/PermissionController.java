@@ -27,8 +27,6 @@ public class PermissionController {
     private PermissionService permissionService;
     @Autowired
     private ModelMapper modelMapper;
-    @Autowired
-    private PermissionRepository permissionRepository;
 
     @PostMapping
     public ApiResponse<PermissionResponse> create(@Valid @RequestBody PermissionCreateRequest request) {

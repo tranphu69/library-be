@@ -4,7 +4,6 @@ import com.example.library.dto.request.user.UserCreateRequest;
 import com.example.library.dto.request.user.UserListRequest;
 import com.example.library.dto.request.user.UserUpdateRequest;
 import com.example.library.dto.response.user.UserListResponse;
-import com.example.library.dto.response.user.UserResponse;
 import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
 import jakarta.servlet.http.HttpServletResponse;

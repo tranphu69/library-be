@@ -10,8 +10,6 @@ import com.example.library.dto.response.user.UserResponseNoRole;
 import com.example.library.entity.User;
 import com.example.library.enums.UserErrorCode;
 import com.example.library.exception.AppException;
-import com.example.library.enums.ErrorCode;
-import com.example.library.repository.UserRepository;
 import com.example.library.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -31,8 +29,6 @@ public class UserController {
     private ModelMapper modelMapper;
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
 
     @PostMapping
     public ApiResponse<UserResponse> create(@Valid @RequestBody UserCreateRequest request){

@@ -8,7 +8,6 @@ import com.example.library.dto.response.role.RoleListResponse;
 import com.example.library.dto.response.role.RoleResponse;
 import com.example.library.dto.response.role.RoleResponseNoPermission;
 import com.example.library.entity.Role;
-import com.example.library.repository.RoleRepository;
 import com.example.library.service.RoleService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -28,8 +27,6 @@ public class RoleController {
     private ModelMapper modelMapper;
     @Autowired
     private RoleService roleService;
-    @Autowired
-    private RoleRepository roleRepository;
 
     @PostMapping
     public ApiResponse<RoleResponse> create(@Valid @RequestBody RoleCreateRequest request){

@@ -1,7 +1,5 @@
 package com.example.library.repository;
 
-import com.example.library.entity.Permission;
-import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
