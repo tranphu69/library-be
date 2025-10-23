@@ -6,11 +6,9 @@ import org.springframework.http.HttpStatusCode;
 
 public enum ErrorCode implements BaseErrorCode {
     // ==== System errors (5xxx) ====
+    UNCATEGORIZED_EXCEPTION(5999, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(5998, "Uncategorized error", HttpStatus.BAD_REQUEST),
     SYSTEM_ERROR(5000, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
-    UNCATEGORIZED_EXCEPTION(5999, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
-
-    // ==== Validation errors (1xxx) ====
 
     // ==== Auth errors (2xxx) ====
     AUTH_UNAUTHORIZED(2001, "You are not authorized", HttpStatus.UNAUTHORIZED),

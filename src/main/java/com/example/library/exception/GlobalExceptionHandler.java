@@ -3,6 +3,7 @@ package com.example.library.exception;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.exception.enums.ErrorCode;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -67,6 +68,26 @@ public class GlobalExceptionHandler {
                 }
             }
         } catch (IllegalArgumentException ignored) { }
+        String message = (attrs == null) ? errorCode.getMessage() : mapAttributes(errorCode.getMessage(), attrs);
+        return buildResponse(errorCode, message);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        BaseErrorCode errorCode = ErrorCode.INVALID_KEY;
+        Map<String, Object> attrs = null;
+        String enumKey = null;
+        try {
+            ConstraintViolation<?> violation = ex.getConstraintViolations().iterator().next();
+            enumKey = violation.getMessage();
+            attrs = violation.getConstraintDescriptor().getAttributes();
+            BaseErrorCode foundCode = errorCodeRegistry.find(enumKey);
+            if (foundCode != null) {
+                errorCode = foundCode;
+            } else {
+                errorCode = ErrorCode.valueOf(enumKey);
+            }
+        } catch (Exception e) {}
         String message = (attrs == null) ? errorCode.getMessage() : mapAttributes(errorCode.getMessage(), attrs);
         return buildResponse(errorCode, message);
     }
