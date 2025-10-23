@@ -1,9 +1,10 @@
 package com.example.library.exception.enums;
 
+import com.example.library.exception.BaseErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
-public enum ErrorCode {
+public enum ErrorCode implements BaseErrorCode {
     // ==== System errors (5xxx) ====
     INVALID_KEY(5998, "Uncategorized error", HttpStatus.BAD_REQUEST),
     SYSTEM_ERROR(5000, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -27,14 +28,17 @@ public enum ErrorCode {
         this.statusCode = statusCode;
     }
 
+    @Override
     public int getCode() {
         return code;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
 
+    @Override
     public HttpStatusCode getStatusCode() {
         return statusCode;
     }

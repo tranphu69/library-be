@@ -3,21 +3,25 @@ package com.example.library.exception;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.exception.enums.ErrorCode;
 import jakarta.validation.ConstraintViolation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    private ResponseEntity<ApiResponse> buildResponse(ErrorCode code) {
+    @Autowired
+    private ErrorCodeRegistry errorCodeRegistry;
+
+    private ResponseEntity<ApiResponse> buildResponse(BaseErrorCode code) {
         return buildResponse(code, code.getMessage());
     }
 
-    private ResponseEntity<ApiResponse> buildResponse(ErrorCode code, String message) {
+    private ResponseEntity<ApiResponse> buildResponse(BaseErrorCode code, String message) {
         ApiResponse res = new ApiResponse();
         res.setCode(code.getCode());
         res.setMessage(message);
@@ -45,17 +49,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> handleValidation(MethodArgumentNotValidException ex) {
         var fieldError = ex.getFieldError();
         String enumKey = fieldError != null ? fieldError.getDefaultMessage() : null;
-        ErrorCode errorCode = ErrorCode.INVALID_KEY;
-        Map<String, Object> attrs = null;
+        BaseErrorCode errorCode = ErrorCode.INVALID_KEY;
+        Map attrs = null;
         try {
-            errorCode = ErrorCode.valueOf(enumKey);
-            var error = ex.getBindingResult().getAllErrors().get(0);
-            if (error.contains(ConstraintViolation.class)) {
-                var violation = error.unwrap(ConstraintViolation.class);
-                attrs = violation.getConstraintDescriptor().getAttributes();
+            BaseErrorCode foundCode = errorCodeRegistry.find(enumKey);
+            if (foundCode != null) {
+                errorCode = foundCode;
+            } else {
+                errorCode = ErrorCode.valueOf(enumKey);
+            }
+            var errors = ex.getBindingResult().getAllErrors();
+            if (!errors.isEmpty()) {
+                var error = errors.get(0);
+                if (error.contains(ConstraintViolation.class)) {
+                    var violation = error.unwrap(ConstraintViolation.class);
+                    attrs = violation.getConstraintDescriptor().getAttributes();
+                }
             }
         } catch (IllegalArgumentException ignored) { }
-        String message = (attrs != null) ? mapAttributes(errorCode.getMessage(), attrs) : errorCode.getMessage();
+        String message = (attrs == null) ? errorCode.getMessage() : mapAttributes(errorCode.getMessage(), attrs);
         return buildResponse(errorCode, message);
     }
 
