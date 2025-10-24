@@ -12,6 +12,8 @@ public enum PermissionErrorCode implements BaseErrorCode {
     PERMISSION_DESCRIPTION_EXCEED(3004, "Trường description vượt quá 255 kí tự!", HttpStatus.BAD_REQUEST),
     PERMISSION_ACTION_EMPTY(3005, "Trường action không được bỏ trống!", HttpStatus.BAD_REQUEST),
     PERMISSION_VALUE(3006, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
+    PERMISSION_ERROR_FILE(3007, "File lỗi!", HttpStatus.BAD_REQUEST),
+    PERMISSION_NOT_READ_FILE(3008, "Không đọc được file!", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

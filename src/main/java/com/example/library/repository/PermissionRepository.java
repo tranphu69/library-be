@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
     boolean existsByName(String name);
@@ -22,4 +24,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             @Param("action") Integer status,
             Pageable pageable
     );
+
+    @Query("SELECT p.name FROM Permission p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<String> findNamesByKeyword(@Param("keyword") String keyword);
 }
