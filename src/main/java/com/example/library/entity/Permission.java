@@ -17,21 +17,21 @@ public class Permission {
     @Column(length = 255)
     private String description;
     @Column(nullable = false)
-    private Short action = 1;
+    private Integer action = 1;
     @CreationTimestamp
-    @Column(name = "createdAt", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @Column(name = "createdBy")
+    @Column(name = "created_by")
     private Long createdBy;
-    @Column(name = "updatedBy")
+    @Column(name = "updated_by")
     private Long updatedBy;
 
     public Permission() {}
 
-    public Permission(Long id, String name, String description, Short action, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy) {
+    public Permission(Long id, String name, String description, Integer action, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -66,11 +66,11 @@ public class Permission {
         this.description = description;
     }
 
-    public Short getAction() {
+    public Integer getAction() {
         return action;
     }
 
-    public void setAction(Short action) {
+    public void setAction(Integer action) {
         this.action = action;
     }
 

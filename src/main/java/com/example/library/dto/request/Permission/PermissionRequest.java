@@ -11,7 +11,7 @@ public class PermissionRequest {
     @NotNull(message = "PERMISSION_ACTION_EMPTY")
     @Min(value = 0, message = "PERMISSION_VALUE")
     @Max(value = 1, message = "PERMISSION_VALUE")
-    private Short action;
+    private Integer action;
 
     public String getName() {
         return name;
@@ -29,11 +29,11 @@ public class PermissionRequest {
         this.description = description;
     }
 
-    public Short getAction() {
+    public Integer getAction() {
         return action;
     }
 
-    public void setAction(Short action) {
+    public void setAction(Integer action) {
         this.action = action;
     }
 }
