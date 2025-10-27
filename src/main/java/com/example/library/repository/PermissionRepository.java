@@ -27,4 +27,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     @Query("SELECT p.name FROM Permission p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<String> findNamesByKeyword(@Param("keyword") String keyword);
+
+    @Query("SELECT p.name FROM Permission p WHERE p.action <> -1")
+    List<String> findAllNames();
 }

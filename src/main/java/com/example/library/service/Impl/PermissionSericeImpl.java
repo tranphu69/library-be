@@ -55,6 +55,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public Permission create(PermissionRequest request) {
         String newName = request.getName().trim();
         if (permissionRepository.existsByName(newName)) {
@@ -68,6 +69,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public Permission update(PermissionRequest request, Long id) {
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new AppException(PermissionErrorCode.PERMISSION_NO_EXSITED));
@@ -86,6 +88,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void delete(List<Long> ids) {
         List<Permission> permissions = permissionRepository.findAllById(ids);
         List<Long> deletedIds = permissions.stream()
@@ -113,7 +116,7 @@ public class PermissionSericeImpl implements PermissionService {
 
     @Override
     public PermissionListResponse getList(PermissionListRequest request) {
-        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
         Page<Permission> permissionPage = permissionRepository.findPermissionsWithFilters(
                 request.getName(),
@@ -194,7 +197,7 @@ public class PermissionSericeImpl implements PermissionService {
 
     @Override
     public void exportToExcel(PermissionListRequest request, HttpServletResponse response) throws IOException {
-        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType());
+        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
         Page<Permission> permissionPage = permissionRepository.findPermissionsWithFilters(
                 request.getName(),
@@ -267,6 +270,7 @@ public class PermissionSericeImpl implements PermissionService {
         try (InputStream is = file.getInputStream()) {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheetAt(0);
+            Set<String> existingNames = new HashSet<>(permissionRepository.findAllNames());
             Set<String> excelNames = new HashSet<>();
             List<Permission> permissions = new ArrayList<>();
             for(int i = 4; i <= sheet.getLastRowNum(); i++) {
@@ -285,7 +289,7 @@ public class PermissionSericeImpl implements PermissionService {
                 if (!excelNames.add(request.getName())){
                     throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
-                if (permissionRepository.existsByName(request.getName())){
+                if (existingNames.contains(request.getName())){
                     throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
                 Permission permission = new Permission();
