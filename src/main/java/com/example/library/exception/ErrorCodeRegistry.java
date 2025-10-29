@@ -2,6 +2,7 @@ package com.example.library.exception;
 
 import com.example.library.exception.enums.ErrorCode;
 import com.example.library.exception.enums.PermissionErrorCode;
+import com.example.library.exception.enums.RoleErrorCode;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ public class ErrorCodeRegistry {
     public void init() {
         register(ErrorCode.values());
         register(PermissionErrorCode.values());
+        register(RoleErrorCode.values());
     }
 
     private void register(BaseErrorCode[] values) {

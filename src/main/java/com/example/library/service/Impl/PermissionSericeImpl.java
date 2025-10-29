@@ -5,9 +5,11 @@ import com.example.library.dto.request.Permission.PermissionRequest;
 import com.example.library.dto.response.Permission.PermissionListResponse;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.entity.Permission;
+import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
 import com.example.library.exception.enums.PermissionErrorCode;
 import com.example.library.repository.PermissionRepository;
+import com.example.library.repository.RoleRepository;
 import com.example.library.service.PermissionService;
 import com.example.library.utils.Utils;
 import com.example.library.utils.UtilsExcel;
@@ -37,6 +39,8 @@ public class PermissionSericeImpl implements PermissionService {
     private PermissionRepository permissionRepository;
     @Autowired
     private Validator validator;
+    @Autowired
+    private RoleRepository roleRepository;
 
     private List<PermissionResponse> getListPermission(Page<Permission> permissionPage) {
         return permissionPage.getContent()
@@ -81,6 +85,10 @@ public class PermissionSericeImpl implements PermissionService {
                 && Objects.equals(permission.getAction(), request.getAction())) {
             return permission;
         }
+        boolean isUsed = roleRepository.existsByPermissions_Id(id);
+        if (isUsed && request.getAction() == 0) {
+            throw new AppException(PermissionErrorCode.PERMISSION_IN_USE_BY_ROLE);
+        }
         permission.setName(newName);
         permission.setDescription(request.getDescription());
         permission.setAction(request.getAction());
@@ -97,6 +105,10 @@ public class PermissionSericeImpl implements PermissionService {
                 .toList();
         if (deletedIds.isEmpty()) {
             throw new AppException(PermissionErrorCode.PERMISSION_NO_EXSITED);
+        }
+        List<Role> rolesUsingPermissions  = roleRepository.findAllByPermissionIds(ids);
+        if (!rolesUsingPermissions.isEmpty()) {
+            throw new AppException(PermissionErrorCode.PERMISSION_IN_USE_BY_ROLE);
         }
         for (Permission permission : permissions) {
             permission.setAction(-1);
@@ -184,8 +196,8 @@ public class PermissionSericeImpl implements PermissionService {
                                 richText.applyFont(7, header.length(), italicFont);
                             }
                             case 2 -> {
-                                richText.applyFont(0, 12, boldFont);
-                                richText.applyFont(12, 13, redBoldFont);
+                                richText.applyFont(0, 11, boldFont);
+                                richText.applyFont(11, 13, redBoldFont);
                                 richText.applyFont(14, header.length(), italicFont);
                             }
                         }
@@ -253,8 +265,8 @@ public class PermissionSericeImpl implements PermissionService {
                                 richText.applyFont(7, header.length(), italicFont);
                             }
                             case 2 -> {
-                                richText.applyFont(0, 12, boldFont);
-                                richText.applyFont(12, 13, redBoldFont);
+                                richText.applyFont(0, 11, boldFont);
+                                richText.applyFont(11, 13, redBoldFont);
                                 richText.applyFont(14, header.length(), italicFont);
                             }
                         }

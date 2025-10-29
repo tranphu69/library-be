@@ -21,7 +21,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             "(:action IS NULL OR p.action = :action)")
     Page<Permission> findPermissionsWithFilters(
             @Param("name") String name,
-            @Param("action") Integer status,
+            @Param("action") Integer action,
             Pageable pageable
     );
 
@@ -30,4 +30,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     @Query("SELECT p.name FROM Permission p WHERE p.action <> -1")
     List<String> findAllNames();
+
+    @Query("SELECT p FROM Permission p WHERE p.id IN :ids AND p.action = 1")
+    List<Permission> findAllActiveById(@Param("ids") List<Long> ids);
 }

@@ -3,10 +3,19 @@ CREATE TABLE permission (
     name VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(255),
     action SMALLINT NOT NULL DEFAULT 0 CHECK (action IN (-1, 0, 1)),
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    createdBy BIGINT,
-    updatedBy BIGINT,
-    CONSTRAINT fk_permission_createdBy FOREIGN KEY (createdBy) REFERENCES users(id),
-    CONSTRAINT fk_permission_updatedBy FOREIGN KEY (updatedBy) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT
+);
+
+CREATE TABLE role (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    action SMALLINT NOT NULL DEFAULT 0 CHECK (action IN (-1, 0, 1)),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_by BIGINT
 );
