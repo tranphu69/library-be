@@ -5,8 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import java.util.List;
-
 public class RoleListRequest {
     @Size(max = 100, message = "ROLE_NAME_EXCEED")
     private String name;
