@@ -161,49 +161,54 @@ public class PermissionSericeImpl implements PermissionService {
                 1, 12000,
                 2, 10000
         );
-        UtilsExcel.exportToExcel(
-                response,
-                "DANH SÁCH PERMISSION",
-                "Thông tin danh sách",
-                headers,
-                dropdowns,
-                widths,
-                permissionResponses,
-                p -> List.of(
-                        p.getName(),
-                        p.getDescription(),
-                        p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                ),
-                (workbook, cells) -> {
-                    Font boldFont = workbook.createFont();
-                    boldFont.setBold(true);
-                    Font redBoldFont = workbook.createFont();
-                    redBoldFont.setBold(true);
-                    redBoldFont.setColor(IndexedColors.RED.getIndex());
-                    Font italicFont = workbook.createFont();
-                    italicFont.setItalic(true);
-                    for (int i = 0; i < headers.size(); i++) {
-                        String header = headers.get(i);
-                        XSSFRichTextString richText = new XSSFRichTextString(header);
-                        switch (i) {
-                            case 0 -> {
-                                richText.applyFont(0, 4, boldFont);
-                                richText.applyFont(4, 5, redBoldFont);
-                                richText.applyFont(6, header.length(), italicFont);
-                            }
-                            case 1 -> {
-                                richText.applyFont(0, 6, boldFont);
-                                richText.applyFont(7, header.length(), italicFont);
-                            }
-                            case 2 -> {
-                                richText.applyFont(0, 11, boldFont);
-                                richText.applyFont(11, 13, redBoldFont);
-                                richText.applyFont(14, header.length(), italicFont);
+        List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
+                new UtilsExcel.ExcelSheetConfig<>(
+                        "DANH SÁCH PERMISSION",
+                        "Thông tin danh sách",
+                        headers,
+                        dropdowns,
+                        widths,
+                        permissionResponses,
+                        p -> List.of(
+                                p.getName(),
+                                p.getDescription(),
+                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
+                        ),
+                        (workbook, cells) -> {
+                            Font boldFont = workbook.createFont();
+                            boldFont.setBold(true);
+                            Font redBoldFont = workbook.createFont();
+                            redBoldFont.setBold(true);
+                            redBoldFont.setColor(IndexedColors.RED.getIndex());
+                            Font italicFont = workbook.createFont();
+                            italicFont.setItalic(true);
+                            for (int i = 0; i < headers.size(); i++) {
+                                String header = headers.get(i);
+                                XSSFRichTextString richText = new XSSFRichTextString(header);
+                                switch (i) {
+                                    case 0 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(4, 5, redBoldFont);
+                                        richText.applyFont(6, header.length(), italicFont);
+                                    }
+                                    case 1 -> {
+                                        richText.applyFont(0, 6, boldFont);
+                                        richText.applyFont(7, header.length(), italicFont);
+                                    }
+                                    case 2 -> {
+                                        richText.applyFont(0, 11, boldFont);
+                                        richText.applyFont(11, 13, redBoldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                }
+                                cells[i].setCellValue(richText);
                             }
                         }
-                        cells[i].setCellValue(richText);
-                    }
-                }
+                )
+        );
+        UtilsExcel.exportToExcel(
+                response,
+                sheets
         );
     }
 
@@ -230,49 +235,54 @@ public class PermissionSericeImpl implements PermissionService {
                 1, 12000,
                 2, 10000
         );
-        UtilsExcel.exportToExcel(
-                response,
-                "DANH SÁCH PERMISSION",
-                "Thông tin danh sách",
-                headers,
-                dropdowns,
-                widths,
-                permissionResponses,
-                p -> List.of(
-                        p.getName(),
-                        p.getDescription(),
-                        p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                ),
-                (workbook, cells) -> {
-                    Font boldFont = workbook.createFont();
-                    boldFont.setBold(true);
-                    Font redBoldFont = workbook.createFont();
-                    redBoldFont.setBold(true);
-                    redBoldFont.setColor(IndexedColors.RED.getIndex());
-                    Font italicFont = workbook.createFont();
-                    italicFont.setItalic(true);
-                    for (int i = 0; i < headers.size(); i++) {
-                        String header = headers.get(i);
-                        XSSFRichTextString richText = new XSSFRichTextString(header);
-                        switch (i) {
-                            case 0 -> {
-                                richText.applyFont(0, 4, boldFont);
-                                richText.applyFont(4, 5, redBoldFont);
-                                richText.applyFont(6, header.length(), italicFont);
-                            }
-                            case 1 -> {
-                                richText.applyFont(0, 6, boldFont);
-                                richText.applyFont(7, header.length(), italicFont);
-                            }
-                            case 2 -> {
-                                richText.applyFont(0, 11, boldFont);
-                                richText.applyFont(11, 13, redBoldFont);
-                                richText.applyFont(14, header.length(), italicFont);
+        List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
+                new UtilsExcel.ExcelSheetConfig<>(
+                        "DANH SÁCH PERMISSION",
+                        "Thông tin danh sách",
+                        headers,
+                        dropdowns,
+                        widths,
+                        permissionResponses,
+                        p -> List.of(
+                                p.getName(),
+                                p.getDescription(),
+                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
+                        ),
+                        (workbook, cells) -> {
+                            Font boldFont = workbook.createFont();
+                            boldFont.setBold(true);
+                            Font redBoldFont = workbook.createFont();
+                            redBoldFont.setBold(true);
+                            redBoldFont.setColor(IndexedColors.RED.getIndex());
+                            Font italicFont = workbook.createFont();
+                            italicFont.setItalic(true);
+                            for (int i = 0; i < headers.size(); i++) {
+                                String header = headers.get(i);
+                                XSSFRichTextString richText = new XSSFRichTextString(header);
+                                switch (i) {
+                                    case 0 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(4, 5, redBoldFont);
+                                        richText.applyFont(6, header.length(), italicFont);
+                                    }
+                                    case 1 -> {
+                                        richText.applyFont(0, 6, boldFont);
+                                        richText.applyFont(7, header.length(), italicFont);
+                                    }
+                                    case 2 -> {
+                                        richText.applyFont(0, 11, boldFont);
+                                        richText.applyFont(11, 13, redBoldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                }
+                                cells[i].setCellValue(richText);
                             }
                         }
-                        cells[i].setCellValue(richText);
-                    }
-                }
+                )
+        );
+        UtilsExcel.exportToExcel(
+                response,
+                sheets
         );
     }
 

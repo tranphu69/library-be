@@ -33,4 +33,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     @Query("SELECT p FROM Permission p WHERE p.id IN :ids AND p.action = 1")
     List<Permission> findAllActiveById(@Param("ids") List<Long> ids);
+
+    @Query("SELECT p FROM Permission p WHERE p.action = 1")
+    List<Permission> findAllStatus1();
 }
