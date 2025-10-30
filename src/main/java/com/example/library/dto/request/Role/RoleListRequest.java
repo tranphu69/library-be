@@ -5,12 +5,15 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 public class RoleListRequest {
     @Size(max = 100, message = "ROLE_NAME_EXCEED")
     private String name;
     @Min(value = 0, message = "ROLE_VALUE")
     @Max(value = 1, message = "ROLE_VALUE")
     private Integer action;
+    private String permissions;
     @Min(value = 0, message = "ROLE_VALUE")
     private Integer page;
     @Min(value = 1, message = "ROLE_VALUE")
@@ -18,6 +21,14 @@ public class RoleListRequest {
     private String sortBy;
     @Pattern(regexp = "^(ASC|DESC)$", message = "ROLE_VALUE")
     private String sortType;
+
+    public String getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
+    }
 
     public String getName() {
         return name;

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,5 +86,21 @@ public class RoleController {
         String fileName = "roles_list.xlsx";
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
         roleService.exportToExcel(request, response);
+    }
+
+    @PostMapping("/import")
+    public ApiResponse<?> importRoles(@RequestParam("file")MultipartFile file) {
+        roleService.importFromExcel(file);
+        ApiResponse<?> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Import thành công!");
+        return apiResponse;
+    }
+
+    @GetMapping("/auto-search")
+    public ApiResponse<List<String>> autoSearch(@RequestParam String keyword){
+        List<String> autoList = roleService.autoSearch(keyword);
+        ApiResponse<List<String>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(autoList);
+        return apiResponse;
     }
 }

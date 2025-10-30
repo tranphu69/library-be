@@ -19,18 +19,21 @@ import com.example.library.utils.Utils;
 import com.example.library.utils.UtilsExcel;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -155,11 +158,17 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleListResponse getList(RoleListRequest request) {
+        List<Long> permissionIds = Arrays.stream(request.getPermissions().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
-        Page<Role> rolePage = roleRepository.findRolesWithFilters(
+        Page<Role> rolePage = roleRepository.findRolesWithAllPermissions(
                 request.getName(),
                 request.getAction(),
+                permissionIds,
                 pageable
         );
         List<RoleResponse> roleResponses = getListRole(rolePage);
@@ -309,11 +318,17 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void exportToExcel(RoleListRequest request, HttpServletResponse response) throws IOException {
+        List<Long> permissionIds = Arrays.stream(request.getPermissions().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
-        Page<Role> rolePage = roleRepository.findRolesWithFilters(
+        Page<Role> rolePage = roleRepository.findRolesWithAllPermissions(
                 request.getName(),
                 request.getAction(),
+                permissionIds,
                 pageable
         );
         List<RoleResponse> roleResponses = getListRole(rolePage);
@@ -447,5 +462,66 @@ public class RoleServiceImpl implements RoleService {
                 response,
                 sheets
         );
+    }
+
+    @Override
+    @Transactional
+    public void importFromExcel(MultipartFile file) {
+        try (InputStream is = file.getInputStream()) {
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheetAt(0);
+            Set<String> existingNames = new HashSet<>(roleRepository.findAllNames());
+            Set<String> excelNames = new HashSet<>();
+            List<Role> roles = new ArrayList<>();
+            for(int i = 4; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if(UtilsExcel.isRowEmpty(row)) continue;
+                RoleRequest request = new RoleRequest();
+                request.setName(UtilsExcel.getCellValue(row.getCell(0)));
+                request.setDescription(UtilsExcel.getCellValue(row.getCell(1)));
+                String statusStr = UtilsExcel.getCellValue(row.getCell(2));
+                Integer status = statusStr.isEmpty() ? null : statusStr.trim().equals("Hoạt động") ? 1 : 0;
+                request.setAction(status);
+                String permissionStr = UtilsExcel.getCellValue(row.getCell(3));
+                List<String> permissionArr = Arrays.stream(permissionStr.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .toList();
+                Set<Permission> permissions = permissionRepository.findByNameIn(permissionArr);
+                List<Long> changePermissions = permissions.stream()
+                        .map(Permission::getId)
+                        .toList();
+                request.setPermissions(changePermissions);
+                Set<ConstraintViolation<RoleRequest>> violations = validator.validate(request);
+                if (!violations.isEmpty()) {
+                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
+                }
+                if (!excelNames.add(request.getName())){
+                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
+                }
+                if (existingNames.contains(request.getName())){
+                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
+                }
+                Role role = new Role();
+                role.setName(request.getName());
+                role.setDescription(request.getDescription());
+                role.setAction(request.getAction());
+                role.setPermissions(new HashSet<>(permissions));
+                roles.add(role);
+            }
+            roleRepository.saveAll(roles);
+            workbook.close();
+        } catch (IOException e) {
+            throw new AppException(PermissionErrorCode.PERMISSION_NOT_READ_FILE);
+        }
+    }
+
+    @Override
+    public List<String> autoSearch(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> results = roleRepository.findNamesByKeyword(keyword);
+        return results != null ? results : Collections.emptyList();
     }
 }

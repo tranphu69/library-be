@@ -22,12 +22,30 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     @Query("SELECT DISTINCT r FROM Role r JOIN r.permissions p WHERE p.id IN :permissionIds")
     List<Role> findAllByPermissionIds(@Param("permissionIds") List<Long> permissionIds);
 
-    @Query("SELECT r FROM Role r WHERE r.action <> -1 AND " +
-            "(:name IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-            "(:action IS NULL OR r.action = :action)")
-    Page<Role> findRolesWithFilters(
+    @Query("""
+    SELECT r FROM Role r
+    JOIN r.permissions p
+    WHERE r.action <> -1
+      AND (:name IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%')))
+      AND (:action IS NULL OR r.action = :action)
+      AND (
+            :permissions IS NULL OR (
+                p.id IN :permissions
+            )
+          )
+    GROUP BY r.id
+    HAVING (:permissions IS NULL OR COUNT(DISTINCT p.id) = :#{#permissions.size()})
+""")
+    Page<Role> findRolesWithAllPermissions(
             @Param("name") String name,
             @Param("action") Integer action,
+            @Param("permissions") List<Long> permissions,
             Pageable pageable
     );
+
+    @Query("SELECT r.name FROM Role r WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<String> findNamesByKeyword(@Param("keyword") String keyword);
+
+    @Query("SELECT r.name FROM Role r WHERE r.action <> -1")
+    List<String> findAllNames();
 }

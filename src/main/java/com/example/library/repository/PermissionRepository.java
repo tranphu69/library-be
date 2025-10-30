@@ -9,12 +9,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
     boolean existsByName(String name);
     boolean existsById(Long id);
     boolean existsByNameAndIdNot(String name, Long id);
+    Set<Permission> findByNameIn(List<String> names);
 
     @Query("SELECT p FROM Permission p WHERE p.action <> -1 AND " +
             "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
