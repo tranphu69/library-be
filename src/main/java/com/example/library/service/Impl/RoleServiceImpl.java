@@ -2,7 +2,7 @@ package com.example.library.service.Impl;
 
 import com.example.library.dto.request.Role.RoleListRequest;
 import com.example.library.dto.request.Role.RoleRequest;
-import com.example.library.dto.response.Permission.PermissionNoAction;
+import com.example.library.dto.response.NoAction;
 import com.example.library.dto.response.Permission.PermissionResponse;
 import com.example.library.dto.response.Role.RoleListResponse;
 import com.example.library.dto.response.Role.RoleResponse;
@@ -49,9 +49,9 @@ public class RoleServiceImpl implements RoleService {
         return rolePage.getContent()
                 .stream()
                 .map(role -> {
-                    Set<PermissionNoAction> noActionSet = role.getPermissions().stream()
+                    Set<NoAction> noActionSet = role.getPermissions().stream()
                             .map(p -> {
-                                PermissionNoAction dto = new PermissionNoAction();
+                                NoAction dto = new NoAction();
                                 dto.setId(p.getId());
                                 dto.setName(p.getName());
                                 dto.setDescription(p.getDescription());
@@ -231,7 +231,7 @@ public class RoleServiceImpl implements RoleService {
                                 p.getName(),
                                 p.getDescription(),
                                 p.getAction() == 1 ? "Hoạt động" : "Không hoạt động",
-                                p.getPermissions().stream().map(PermissionNoAction::getName).collect(Collectors.joining(", "))
+                                p.getPermissions().stream().map(NoAction::getName).collect(Collectors.joining(", "))
                         ),
                         (workbook, cells) -> {
                             Font boldFont = workbook.createFont();
@@ -379,7 +379,7 @@ public class RoleServiceImpl implements RoleService {
                                 p.getName(),
                                 p.getDescription(),
                                 p.getAction() == 1 ? "Hoạt động" : "Không hoạt động",
-                                p.getPermissions().stream().map(PermissionNoAction::getName).collect(Collectors.joining(", "))
+                                p.getPermissions().stream().map(NoAction::getName).collect(Collectors.joining(", "))
                         ),
                         (workbook, cells) -> {
                             Font boldFont = workbook.createFont();

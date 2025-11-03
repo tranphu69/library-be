@@ -1,14 +1,14 @@
-package com.example.library.dto.response.Permission;
+package com.example.library.dto.response;
 
-public class PermissionNoAction {
+public class NoAction {
     private Long id;
     private String name;
     private String description;
 
-    public PermissionNoAction() {
+    public NoAction() {
     }
 
-    public PermissionNoAction(Long id, String name, String description) {
+    public NoAction(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;

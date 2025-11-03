@@ -3,6 +3,7 @@ package com.example.library.exception;
 import com.example.library.exception.messageError.ErrorCode;
 import com.example.library.exception.messageError.PermissionErrorCode;
 import com.example.library.exception.messageError.RoleErrorCode;
+import com.example.library.exception.messageError.UserErrorCode;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ public class ErrorCodeRegistry {
         register(ErrorCode.values());
         register(PermissionErrorCode.values());
         register(RoleErrorCode.values());
+        register(UserErrorCode.values());
     }
 
     private void register(BaseErrorCode[] values) {

@@ -23,7 +23,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @Size(min = 6, max = 100)
     @Column(length = 100, nullable = false, unique = true)
     private String username;
     @Email
@@ -57,6 +56,10 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @Column(name = "created_by")
+    private Long createdBy;
+    @Column(name = "updated_by")
+    private Long updatedBy;
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt; // lần đăng nhập gần nhất
     @Column(name = "failed_login_attempts", nullable = false)
@@ -80,7 +83,7 @@ public class User {
     public User() {
     }
 
-    public User(String id, String username, String email, String password, String fullName, String code, String phone, String avatarUrl, String major, String course, Position position, Gender gender, LocalDate dob, AccountStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime lastLoginAt, Integer failedLoginAttempts, LocalDateTime lockedUntil, Boolean twoFactorEnabled, Set<Role> roles, List<UserOtp> otps, List<RefreshToken> refreshTokens) {
+    public User(String id, String username, String email, String password, String fullName, String code, String phone, String avatarUrl, String major, String course, Position position, Gender gender, LocalDate dob, AccountStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, LocalDateTime lastLoginAt, Integer failedLoginAttempts, LocalDateTime lockedUntil, Boolean twoFactorEnabled, Set<Role> roles, List<UserOtp> otps, List<RefreshToken> refreshTokens) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -97,6 +100,8 @@ public class User {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
         this.lastLoginAt = lastLoginAt;
         this.failedLoginAttempts = failedLoginAttempts;
         this.lockedUntil = lockedUntil;
@@ -114,11 +119,11 @@ public class User {
         this.id = id;
     }
 
-    public @Size(min = 6, max = 100) String getUsername() {
+    public String getUsername() {
         return username;
     }
 
-    public void setUsername(@Size(min = 6, max = 100) String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
@@ -232,6 +237,22 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public LocalDateTime getLastLoginAt() {
