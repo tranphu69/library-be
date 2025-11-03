@@ -3,6 +3,7 @@ package com.example.library.dto.request.User;
 import com.example.library.enums.AccountStatus;
 import com.example.library.enums.Gender;
 import com.example.library.enums.Position;
+import com.example.library.validation.OnCreate;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
@@ -16,11 +17,12 @@ public class UserRequest {
     @Size(max = 100, message = "USER_EMAIL_EXCEED")
     @Email(message = "USER_NOT_EMAIL")
     private String email;
-    @NotBlank(message = "USER_PASSWORD_EMPTY")
-    @Size(min = 10, max = 16, message = "USER_PASSWORD_EXCEED")
+    @NotBlank(message = "USER_PASSWORD_EMPTY", groups = OnCreate.class)
+    @Size(min = 10, max = 16, message = "USER_PASSWORD_EXCEED", groups = OnCreate.class)
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$",
-            message = "USER_PASSWORD_CHARACTER"
+            message = "USER_PASSWORD_CHARACTER",
+            groups = OnCreate.class
     )
     private String password;
     @Size(max = 100, message = "USER_FULLNAME_EXCEED")
@@ -43,73 +45,67 @@ public class UserRequest {
     @Size(min = 1, message = "USER_ROLE_EMPTY")
     private List<Long> roles;
 
-    public @NotBlank(message = "USER_USERNAME_EMPTY") @Size(max = 100, message = "USER_USERNAME_EXCEED") String getUsername() {
+    public String getUsername() {
         return username;
     }
 
-    public void setUsername(@NotBlank(message = "USER_USERNAME_EMPTY") @Size(max = 100, message = "USER_USERNAME_EXCEED") String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public @NotBlank(message = "USER_EMAIL_EMPTY") @Size(max = 100, message = "USER_EMAIL_EXCEED") @Email(message = "USER_NOT_EMAIL") String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(@NotBlank(message = "USER_EMAIL_EMPTY") @Size(max = 100, message = "USER_EMAIL_EXCEED") @Email(message = "USER_NOT_EMAIL") String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public @NotBlank(message = "USER_PASSWORD_EMPTY") @Size(min = 10, max = 16, message = "USER_PASSWORD_EXCEED") @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$",
-            message = "USER_PASSWORD_CHARACTER"
-    ) String getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(@NotBlank(message = "USER_PASSWORD_EMPTY") @Size(min = 10, max = 16, message = "USER_PASSWORD_EXCEED") @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$",
-            message = "USER_PASSWORD_CHARACTER"
-    ) String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    public @Size(max = 100, message = "USER_FULLNAME_EXCEED") String getFullName() {
+    public String getFullName() {
         return fullName;
     }
 
-    public void setFullName(@Size(max = 100, message = "USER_FULLNAME_EXCEED") String fullName) {
+    public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
-    public @Size(max = 100, message = "USER_CODE_EXCEED") String getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(@Size(max = 100, message = "USER_CODE_EXCEED") String code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
-    public @Pattern(regexp = "^[0-9]{10,11}$", message = "USER_PHONE_NUMBER") String getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(@Pattern(regexp = "^[0-9]{10,11}$", message = "USER_PHONE_NUMBER") String phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    public @Size(max = 100, message = "USER_CODE_MAJOR") String getMajor() {
+    public String getMajor() {
         return major;
     }
 
-    public void setMajor(@Size(max = 100, message = "USER_CODE_MAJOR") String major) {
+    public void setMajor(String major) {
         this.major = major;
     }
 
-    public @Size(max = 100, message = "USER_CODE_COURSE") String getCourse() {
+    public String getCourse() {
         return course;
     }
 
-    public void setCourse(@Size(max = 100, message = "USER_CODE_COURSE") String course) {
+    public void setCourse(String course) {
         this.course = course;
     }
 
@@ -161,11 +157,11 @@ public class UserRequest {
         this.twoFactorEnabled = twoFactorEnabled;
     }
 
-    public @NotNull(message = "USER_ROLE_EMPTY") @Size(min = 1, message = "USER_ROLE_EMPTY") List<Long> getRoles() {
+    public List<Long> getRoles() {
         return roles;
     }
 
-    public void setRoles(@NotNull(message = "USER_ROLE_EMPTY") @Size(min = 1, message = "USER_ROLE_EMPTY") List<Long> roles) {
+    public void setRoles(List<Long> roles) {
         this.roles = roles;
     }
 }
