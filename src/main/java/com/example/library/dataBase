@@ -19,3 +19,46 @@ CREATE TABLE role (
     created_by BIGINT,
     updated_by BIGINT
 );
+
+CREATE TABLE users (
+    id VARCHAR(36) PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100),
+    code VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(100) UNIQUE,
+    avatar_url TEXT,
+    major VARCHAR(100),
+    course VARCHAR(100),
+    position VARCHAR(50),
+    gender VARCHAR(20),
+    dob DATE,
+    status VARCHAR(50),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login_at DATETIME,
+    failed_login_attempts INT NOT NULL DEFAULT 0,
+    locked_until DATETIME,
+    two_factor_enabled BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE user_otps (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id VARCHAR(36) NOT NULL,
+    code VARCHAR(6) NOT NULL,
+    expired_at DATETIME NOT NULL,
+    purpose VARCHAR(50) NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE refresh_tokens (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    token VARCHAR(500) NOT NULL UNIQUE,
+    expired_at DATETIME NOT NULL,
+    revoked BOOLEAN NOT NULL DEFAULT FALSE,
+    device_info TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
