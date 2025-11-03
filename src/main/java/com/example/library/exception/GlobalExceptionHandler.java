@@ -1,7 +1,7 @@
 package com.example.library.exception;
 
 import com.example.library.dto.response.ApiResponse;
-import com.example.library.exception.enums.ErrorCode;
+import com.example.library.exception.messageError.ErrorCode;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;

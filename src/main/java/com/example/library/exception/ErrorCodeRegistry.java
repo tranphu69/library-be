@@ -1,8 +1,8 @@
 package com.example.library.exception;
 
-import com.example.library.exception.enums.ErrorCode;
-import com.example.library.exception.enums.PermissionErrorCode;
-import com.example.library.exception.enums.RoleErrorCode;
+import com.example.library.exception.messageError.ErrorCode;
+import com.example.library.exception.messageError.PermissionErrorCode;
+import com.example.library.exception.messageError.RoleErrorCode;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 

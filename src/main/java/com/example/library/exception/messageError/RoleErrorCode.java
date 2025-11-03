@@ -1,4 +1,4 @@
-package com.example.library.exception.enums;
+package com.example.library.exception.messageError;
 
 import com.example.library.exception.BaseErrorCode;
 import org.springframework.http.HttpStatus;
