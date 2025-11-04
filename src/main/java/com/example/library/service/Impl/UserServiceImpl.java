@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.library.enums.AccountStatus;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,6 +39,20 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(newEmail)) {
             throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
         }
+        String newPhone = request.getPhone();
+        if (newPhone != null && !newPhone.trim().isEmpty()) {
+            newPhone = newPhone.trim();
+            if (userRepository.existsByPhone(newPhone)) {
+                throw new AppException(UserErrorCode.USER_PHONE_EXSITED);
+            }
+        }
+        String newCode = request.getCode();
+        if (newCode != null && !newCode.trim().isEmpty()) {
+            newCode = newCode.trim();
+            if (userRepository.existsByCode(newCode)) {
+                throw new AppException(UserErrorCode.USER_CODE_EXSITED);
+            }
+        }
         List<Role> roles = new ArrayList<>();
         if (!request.getRoles().isEmpty()) {
             roles = roleRepository.findAllActiveById(request.getRoles());
@@ -51,7 +66,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(request.getPassword());
         user.setFullName(request.getFullName() != null ? request.getFullName().trim() : null);
         user.setCode(request.getCode() != null ? request.getCode().trim() : null);
-        user.setPhone(request.getPhone() != null ? request.getPhone().trim() : null);
+        user.setPhone(newPhone);
         user.setMajor(request.getMajor() != null ? request.getMajor().trim() : null);
         user.setCourse(request.getCourse() != null ? request.getCourse().trim() : null);
         user.setAvatarUrl(request.getAvatarUrl());
@@ -65,6 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(UserRequest request, String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
@@ -75,6 +91,20 @@ public class UserServiceImpl implements UserService {
         String newEmail = request.getEmail().trim();
         if (userRepository.existsByEmailAndIdNot(newEmail, id)) {
             throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
+        }
+        String newPhone = request.getPhone();
+        if (newPhone != null && !newPhone.trim().isEmpty()) {
+            newPhone = newPhone.trim();
+            if (userRepository.existsByPhoneAndIdNot(newPhone, id)) {
+                throw new AppException(UserErrorCode.USER_PHONE_EXSITED);
+            }
+        }
+        String newCode = request.getCode();
+        if (newCode != null && !newCode.trim().isEmpty()) {
+            newCode = newCode.trim();
+            if (userRepository.existsByCodeAndIdNot(newCode, id)) {
+                throw new AppException(UserErrorCode.USER_CODE_EXSITED);
+            }
         }
         List<Role> roles = new ArrayList<>();
         if (!request.getRoles().isEmpty()) {
@@ -87,7 +117,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(newEmail);
         user.setFullName(request.getFullName() != null ? request.getFullName().trim() : null);
         user.setCode(request.getCode() != null ? request.getCode().trim() : null);
-        user.setPhone(request.getPhone() != null ? request.getPhone().trim() : null);
+        user.setPhone(newPhone);
         user.setMajor(request.getMajor() != null ? request.getMajor().trim() : null);
         user.setCourse(request.getCourse() != null ? request.getCourse().trim() : null);
         user.setAvatarUrl(request.getAvatarUrl());
@@ -98,5 +128,32 @@ public class UserServiceImpl implements UserService {
         user.setTwoFactorEnabled(request.getTwoFactorEnabled());
         user.setRoles(new HashSet<>(roles));
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void delete(List<String> id) {
+        List<User> users = userRepository.findAllById(id);
+        List<String> deleteIds = users.stream()
+                .filter(u -> u.getStatus() != AccountStatus.DELETED)
+                .map(User::getId)
+                .toList();
+        if (deleteIds.isEmpty()) {
+            throw new AppException(UserErrorCode.USER_NO_EXSITED);
+        }
+        for (User user : users) {
+            user.setStatus(AccountStatus.DELETED);
+        }
+        userRepository.saveAll(users);
+    }
+
+    @Override
+    public User detail(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
+        if (user.getStatus() == AccountStatus.DELETED) {
+            throw new AppException(UserErrorCode.USER_NO_EXSITED);
+        }
+        return user;
     }
 }
