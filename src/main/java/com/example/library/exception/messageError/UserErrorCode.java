@@ -18,7 +18,11 @@ public enum UserErrorCode implements BaseErrorCode {
     USER_CODE_COURSE(3030, "Trường course vượt quá 100 kí tự!", HttpStatus.BAD_REQUEST),
     USER_PHONE_NUMBER(3031, "Trường phone chỉ được nhập số!", HttpStatus.BAD_REQUEST),
     USER_CODE_MAJOR(3032, "Trường major vượt quá 100 kí tự!", HttpStatus.BAD_REQUEST),
-    USER_ROLE_EMPTY(3033, "Role không được để trống!", HttpStatus.BAD_REQUEST)
+    USER_ROLE_EMPTY(3033, "Role không được để trống!", HttpStatus.BAD_REQUEST),
+    USER_USERNAME_EXSITED(3034, "Username đã tồn tại!", HttpStatus.BAD_REQUEST),
+    USER_EMAIL_EXSITED(3035, "Email đã tồn tại!", HttpStatus.BAD_REQUEST),
+    USER_VALUE(3036, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
+    USER_STATUS_EMPTY(3037, "Trường status không được để trống!", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

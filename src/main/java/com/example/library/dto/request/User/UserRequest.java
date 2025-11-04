@@ -39,8 +39,9 @@ public class UserRequest {
     private Position position;
     private Gender gender;
     private LocalDate dob;
+    @NotNull(message = "USER_STATUS_EMPTY")
     private AccountStatus status;
-    private Boolean twoFactorEnabled;
+    private Boolean twoFactorEnabled = false;
     @NotNull(message = "USER_ROLE_EMPTY")
     @Size(min = 1, message = "USER_ROLE_EMPTY")
     private List<Long> roles;

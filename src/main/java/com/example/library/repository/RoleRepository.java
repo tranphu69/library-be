@@ -1,5 +1,6 @@
 package com.example.library.repository;
 
+import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,4 +47,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query("SELECT r.name FROM Role r WHERE r.action <> -1")
     List<String> findAllNames();
+
+    @Query("SELECT r FROM Role r WHERE r.id IN :ids AND r.action = 1")
+    List<Role> findAllActiveById(@Param("ids") List<Long> ids);
 }

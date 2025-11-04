@@ -2,10 +2,13 @@ package com.example.library.exception;
 
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.exception.messageError.ErrorCode;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -90,6 +93,18 @@ public class GlobalExceptionHandler {
         } catch (Exception e) {}
         String message = (attrs == null) ? errorCode.getMessage() : mapAttributes(errorCode.getMessage(), attrs);
         return buildResponse(errorCode, message);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException) {
+            InvalidFormatException invalidEx = (InvalidFormatException) cause;
+            if (invalidEx.getTargetType() != null && invalidEx.getTargetType().isEnum()) {
+                return buildResponse(ErrorCode.NOT_VALUE);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dữ liệu không hợp lệ.");
     }
 
     @ExceptionHandler(Exception.class)

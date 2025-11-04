@@ -8,6 +8,7 @@ public enum ErrorCode implements BaseErrorCode {
     // ==== System errors (5xxx) ====
     UNCATEGORIZED_EXCEPTION(5999, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(5998, "Uncategorized error", HttpStatus.BAD_REQUEST),
+    NOT_VALUE(5997, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
     SYSTEM_ERROR(5000, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // ==== Auth errors (2xxx) ====
