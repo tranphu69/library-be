@@ -5,5 +5,4 @@ public enum AccountStatus {
     SUSPENDED,             // Tạm khóa
     BANNED,                // Bị cấm vĩnh viễn
     DELETED                // Đã xóa
-
 }

@@ -5,4 +5,5 @@ import com.example.library.entity.User;
 
 public interface UserService {
     User create(UserRequest request);
+    User update(UserRequest request, String id);
 }

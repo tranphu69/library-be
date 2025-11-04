@@ -23,6 +23,7 @@ public enum UserErrorCode implements BaseErrorCode {
     USER_EMAIL_EXSITED(3035, "Email đã tồn tại!", HttpStatus.BAD_REQUEST),
     USER_VALUE(3036, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
     USER_STATUS_EMPTY(3037, "Trường status không được để trống!", HttpStatus.BAD_REQUEST),
+    USER_NO_EXSITED(3038, "User không tồn tại!", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

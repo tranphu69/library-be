@@ -63,4 +63,40 @@ public class UserServiceImpl implements UserService {
         user.setRoles(new HashSet<>(roles));
         return userRepository.save(user);
     }
+
+    @Override
+    public User update(UserRequest request, String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
+        String newUsername = request.getUsername().trim();
+        if (userRepository.existsByUsernameAndIdNot(newUsername, id)) {
+            throw new AppException(UserErrorCode.USER_USERNAME_EXSITED);
+        }
+        String newEmail = request.getEmail().trim();
+        if (userRepository.existsByEmailAndIdNot(newEmail, id)) {
+            throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
+        }
+        List<Role> roles = new ArrayList<>();
+        if (!request.getRoles().isEmpty()) {
+            roles = roleRepository.findAllActiveById(request.getRoles());
+            if (roles.size() != request.getRoles().size()) {
+                throw new AppException(RoleErrorCode.ROLE_NO_EXSITED);
+            }
+        }
+        user.setUsername(newUsername);
+        user.setEmail(newEmail);
+        user.setFullName(request.getFullName() != null ? request.getFullName().trim() : null);
+        user.setCode(request.getCode() != null ? request.getCode().trim() : null);
+        user.setPhone(request.getPhone() != null ? request.getPhone().trim() : null);
+        user.setMajor(request.getMajor() != null ? request.getMajor().trim() : null);
+        user.setCourse(request.getCourse() != null ? request.getCourse().trim() : null);
+        user.setAvatarUrl(request.getAvatarUrl());
+        user.setPosition(request.getPosition());
+        user.setGender(request.getGender());
+        user.setDob(request.getDob());
+        user.setStatus(request.getStatus());
+        user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        user.setRoles(new HashSet<>(roles));
+        return userRepository.save(user);
+    }
 }
