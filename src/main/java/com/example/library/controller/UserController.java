@@ -1,17 +1,22 @@
 package com.example.library.controller;
 
+import com.example.library.dto.request.User.UserListRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.ApiResponse;
+import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.UserResponse;
 import com.example.library.entity.User;
 import com.example.library.service.UserService;
 import com.example.library.validation.OnCreate;
 import com.example.library.validation.OnUpdate;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -57,5 +62,21 @@ public class UserController {
         UserResponse response = modelMapper.map(user, UserResponse.class);
         apiResponse.setResult(response);
         return apiResponse;
+    }
+
+    @GetMapping
+    public ApiResponse<PageResponse<UserResponse>> getList(@Valid @RequestBody UserListRequest request) {
+        PageResponse<UserResponse> response = userService.getList(request);
+        ApiResponse<PageResponse<UserResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(response);
+        return apiResponse;
+    }
+
+    @GetMapping("/template-file")
+    public void exportTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "template_users.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        userService.exportTemplateExcel(response);
     }
 }

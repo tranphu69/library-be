@@ -49,4 +49,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query("SELECT r FROM Role r WHERE r.id IN :ids AND r.action = 1")
     List<Role> findAllActiveById(@Param("ids") List<Long> ids);
+
+    @Query("SELECT r FROM Role r WHERE r.action = 1")
+    List<Role> findAllStatus1();
 }
