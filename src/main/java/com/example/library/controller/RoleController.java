@@ -3,8 +3,8 @@ package com.example.library.controller;
 import com.example.library.dto.request.Role.RoleListRequest;
 import com.example.library.dto.request.Role.RoleRequest;
 import com.example.library.dto.response.ApiResponse;
-import com.example.library.dto.response.Role.RoleListResponse;
-import com.example.library.dto.response.Role.RoleResponse;
+import com.example.library.dto.response.PageResponse;
+import com.example.library.dto.response.RoleResponse;
 import com.example.library.entity.Role;
 import com.example.library.service.RoleService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,11 +63,11 @@ public class RoleController {
     }
 
     @GetMapping
-    public ApiResponse<RoleListResponse> getList(
+    public ApiResponse<PageResponse<RoleResponse>> getList(
             @Valid @ModelAttribute RoleListRequest request
     ) {
-        RoleListResponse response = roleService.getList(request);
-        ApiResponse<RoleListResponse> apiResponse = new ApiResponse<>();
+        PageResponse<RoleResponse> response = roleService.getList(request);
+        ApiResponse<PageResponse<RoleResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(response);
         return apiResponse;
     }

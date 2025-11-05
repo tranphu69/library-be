@@ -3,9 +3,9 @@ package com.example.library.service.Impl;
 import com.example.library.dto.request.Role.RoleListRequest;
 import com.example.library.dto.request.Role.RoleRequest;
 import com.example.library.dto.response.NoAction;
-import com.example.library.dto.response.Permission.PermissionResponse;
-import com.example.library.dto.response.Role.RoleListResponse;
-import com.example.library.dto.response.Role.RoleResponse;
+import com.example.library.dto.response.PageResponse;
+import com.example.library.dto.response.PermissionResponse;
+import com.example.library.dto.response.RoleResponse;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
@@ -156,7 +156,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleListResponse getList(RoleListRequest request) {
+    public PageResponse<RoleResponse> getList(RoleListRequest request) {
         List<Long> permissionIds = Arrays.stream(request.getPermissions().split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
@@ -171,7 +171,7 @@ public class RoleServiceImpl implements RoleService {
                 pageable
         );
         List<RoleResponse> roleResponses = getListRole(rolePage);
-        RoleListResponse response = new RoleListResponse();
+        PageResponse<RoleResponse> response = new PageResponse<>();
         response.setData(roleResponses);
         response.setCurrentPage(request.getPage());
         response.setCurrentSize(request.getSize());

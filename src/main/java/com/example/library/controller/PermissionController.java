@@ -3,8 +3,8 @@ package com.example.library.controller;
 import com.example.library.dto.request.Permission.PermissionListRequest;
 import com.example.library.dto.request.Permission.PermissionRequest;
 import com.example.library.dto.response.ApiResponse;
-import com.example.library.dto.response.Permission.PermissionListResponse;
-import com.example.library.dto.response.Permission.PermissionResponse;
+import com.example.library.dto.response.PageResponse;
+import com.example.library.dto.response.PermissionResponse;
 import com.example.library.entity.Permission;
 import com.example.library.service.PermissionService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,11 +63,11 @@ public class PermissionController {
     }
 
     @GetMapping
-    public ApiResponse<PermissionListResponse> getList(
+    public ApiResponse<PageResponse<PermissionResponse>> getList(
             @Valid @ModelAttribute PermissionListRequest request
     ){
-        PermissionListResponse response = permissionService.getList(request);
-        ApiResponse<PermissionListResponse> apiResponse = new ApiResponse<>();
+        PageResponse<PermissionResponse> response = permissionService.getList(request);
+        ApiResponse<PageResponse<PermissionResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(response);
         return apiResponse;
     }

@@ -1,6 +1,5 @@
 package com.example.library.repository;
 
-import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +27,12 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
       AND (:name IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%')))
       AND (:action IS NULL OR r.action = :action)
       AND (
-            :permissions IS NULL OR (
-                p.id IN :permissions
-            )
-          )
+        :permissions IS NULL\s
+        OR :#{#permissions.isEmpty()} = TRUE
+        OR p.id IN :permissions
+      )
     GROUP BY r.id
-    HAVING (:permissions IS NULL OR COUNT(DISTINCT p.id) = :#{#permissions.size()})
+    HAVING (:permissions IS NULL OR :#{#permissions.isEmpty()} = TRUE OR COUNT(DISTINCT p.id) = :#{#permissions.size()})
 """)
     Page<Role> findRolesWithAllPermissions(
             @Param("name") String name,

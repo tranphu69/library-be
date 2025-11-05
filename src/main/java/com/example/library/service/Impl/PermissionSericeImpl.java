@@ -2,8 +2,8 @@ package com.example.library.service.Impl;
 
 import com.example.library.dto.request.Permission.PermissionListRequest;
 import com.example.library.dto.request.Permission.PermissionRequest;
-import com.example.library.dto.response.Permission.PermissionListResponse;
-import com.example.library.dto.response.Permission.PermissionResponse;
+import com.example.library.dto.response.PageResponse;
+import com.example.library.dto.response.PermissionResponse;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
@@ -127,7 +127,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
-    public PermissionListResponse getList(PermissionListRequest request) {
+    public PageResponse<PermissionResponse> getList(PermissionListRequest request) {
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
         Page<Permission> permissionPage = permissionRepository.findPermissionsWithFilters(
@@ -136,7 +136,7 @@ public class PermissionSericeImpl implements PermissionService {
                 pageable
         );
         List<PermissionResponse> permissionResponses = getListPermission(permissionPage);
-        PermissionListResponse response = new PermissionListResponse();
+        PageResponse<PermissionResponse> response = new PageResponse<>();
         response.setData(permissionResponses);
         response.setCurrentPage(request.getPage());
         response.setCurrentSize(permissionPage.getSize());

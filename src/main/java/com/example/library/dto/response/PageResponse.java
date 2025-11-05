@@ -1,21 +1,19 @@
-package com.example.library.dto.response.User;
-
-import com.example.library.dto.response.Role.RoleResponse;
+package com.example.library.dto.response;
 
 import java.util.List;
 
-public class UserListResponse {
-    private List<UserResponse> data;
+public class PageResponse<T> {
+    private List<T> data;
     private Integer currentPage;
     private Integer currentSize;
     private Integer totalPages;
     private Integer totalElements;
 
-    public List<UserResponse> getData() {
+    public List<T> getData() {
         return data;
     }
 
-    public void setData(List<UserResponse> data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 

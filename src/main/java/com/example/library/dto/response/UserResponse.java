@@ -1,6 +1,5 @@
-package com.example.library.dto.response.User;
+package com.example.library.dto.response;
 
-import com.example.library.dto.response.NoAction;
 import com.example.library.enums.AccountStatus;
 import com.example.library.enums.Gender;
 import com.example.library.enums.Position;

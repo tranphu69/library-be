@@ -1,6 +1,4 @@
-package com.example.library.dto.response.Role;
-
-import com.example.library.dto.response.NoAction;
+package com.example.library.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.Set;

@@ -2,7 +2,7 @@ package com.example.library.controller;
 
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.ApiResponse;
-import com.example.library.dto.response.User.UserResponse;
+import com.example.library.dto.response.UserResponse;
 import com.example.library.entity.User;
 import com.example.library.service.UserService;
 import com.example.library.validation.OnCreate;
