@@ -664,9 +664,7 @@ public class UserServiceImpl implements UserService {
             case STRING:
                 return cell.getStringCellValue().trim();
             case NUMERIC:
-                // Dùng BigDecimal để giữ nguyên số (tránh mất chữ số)
-                return new java.math.BigDecimal(cell.getNumericCellValue())
-                        .toPlainString();
+                return new java.math.BigDecimal(cell.getNumericCellValue()).toPlainString();
             default:
                 return "";
         }
