@@ -88,12 +88,14 @@ public class UtilsExcel {
                 @SuppressWarnings("unchecked")
                 Function<Object, List<Object>> mapper = (Function<Object, List<Object>>) (Function<?, List<Object>>) config.getDataMapper();
                 for (Object item : dataRows) {
+                    if (item == null) continue;
                     List<Object> cellValues = mapper.apply(item);
+                    if (cellValues == null) continue;
                     Row row = sheet.createRow(rowIndex++);
                     for (int i = 0; i < cellValues.size(); i++) {
                         Cell cell = row.createCell(i);
                         Object value = cellValues.get(i);
-                        cell.setCellValue(value != null ? value.toString() : "");
+                        cell.setCellValue(value == null ? "" : value.toString());
                         cell.setCellStyle(dataStyle);
                     }
                 }

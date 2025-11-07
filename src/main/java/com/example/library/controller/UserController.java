@@ -1,5 +1,6 @@
 package com.example.library.controller;
 
+import com.example.library.dto.request.User.UserAutoSearch;
 import com.example.library.dto.request.User.UserListRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.ApiResponse;
@@ -15,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -78,5 +80,29 @@ public class UserController {
         String fileName = "template_users.xlsx";
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
         userService.exportTemplateExcel(response);
+    }
+
+    @PostMapping("/export")
+    public void exportRole(@RequestBody UserListRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        String fileName = "users_list.xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        userService.exportToExcel(request, response);
+    }
+
+    @PostMapping("/import")
+    public ApiResponse<?> importUsers(@RequestParam("file")MultipartFile file) {
+        userService.importFromExcel(file);
+        ApiResponse<?> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Import thành công!");
+        return apiResponse;
+    }
+
+    @PostMapping("/auto-search")
+    public ApiResponse<List<String>> autoSearch(@RequestBody UserAutoSearch keyword){
+        List<String> autoList = userService.autoSearch(keyword);
+        ApiResponse<List<String>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(autoList);
+        return apiResponse;
     }
 }

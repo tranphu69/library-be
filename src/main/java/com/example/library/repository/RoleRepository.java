@@ -1,5 +1,6 @@
 package com.example.library.repository;
 
+import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
@@ -16,6 +18,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     boolean existsById(Long id);
     boolean existsByNameAndIdNot(String name, Long id);
     boolean existsByPermissions_Id(Long permissionId);
+    Set<Role> findByNameIn(List<String> names);
 
     @Query("SELECT DISTINCT r FROM Role r JOIN r.permissions p WHERE p.id IN :permissionIds")
     List<Role> findAllByPermissionIds(@Param("permissionIds") List<Long> permissionIds);

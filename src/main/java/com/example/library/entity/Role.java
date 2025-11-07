@@ -30,7 +30,7 @@ public class Role {
     private Long createdBy;
     @Column(name = "updated_by")
     private Long updatedBy;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permissions",
             joinColumns = @JoinColumn(name = "role_id"),

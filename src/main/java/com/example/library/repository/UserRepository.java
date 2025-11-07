@@ -63,4 +63,16 @@ public interface UserRepository extends JpaRepository<User, String> {
             @Param("roles") List<Long> roles,
             Pageable pageable
     );
+
+    @Query("SELECT u.username FROM User u WHERE u.status <> \"DELETED\"")
+    List<String> findAllUsernames();
+
+    @Query("SELECT u.email FROM User u WHERE u.status <> \"DELETED\"")
+    List<String> findAllEmails();
+
+    @Query("SELECT u.code FROM User u WHERE u.status <> \"DELETED\"")
+    List<String> findAllCodes();
+
+    @Query("SELECT u.phone FROM User u WHERE u.status <> \"DELETED\"")
+    List<String> findAllPhones();
 }

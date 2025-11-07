@@ -31,7 +31,7 @@ public class User {
     private String password;
     @Column(name = "full_name", length = 100)
     private String fullName;
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 100, unique = true)
     private String code; // mã định danh
     @Pattern(regexp = "^[0-9]{10,11}$")
     @Column(length = 100, unique = true)
@@ -65,9 +65,9 @@ public class User {
     private Integer failedLoginAttempts = 0; // số lần login sai
     @Column(name = "locked_until")
     private LocalDateTime lockedUntil; // thời điểm hết khóa tạm
-    @Column(name = "two_factor_enabled", nullable=false)
+    @Column(name = "two_factor_enabled", nullable = false)
     private Boolean twoFactorEnabled = false; // có bật xác thực 2 lớp không
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -26,7 +26,7 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
-    code VARCHAR(100) NOT NULL UNIQUE,
+    code VARCHAR(100) UNIQUE,
     phone VARCHAR(100) UNIQUE,
     avatar_url TEXT,
     major VARCHAR(100),
