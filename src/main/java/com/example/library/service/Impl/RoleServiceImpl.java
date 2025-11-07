@@ -187,7 +187,7 @@ public class RoleServiceImpl implements RoleService {
                 "Tên * \n(Tối đa 100 kí tự)",
                 "Mô tả \n(Tối đa 255 kí tự)",
                 "Trạng thái * \n(Hoạt động hoặc Không hoạt động)",
-                "Permission * \n(Phải chọn ít nhất 1 permission)"
+                "Quyền thao tác * \n(Phải chọn ít nhất 1 quyền thao tác)"
         );
         Map<Integer, String[]> dropdowns = Map.of(
                 2, new String[]{"Hoạt động", "Không hoạt động"}
@@ -202,9 +202,6 @@ public class RoleServiceImpl implements RoleService {
                 "Tên * \n(Tối đa 50 kí tự)",
                 "Mô tả \n(Tối đa 255 kí tự)",
                 "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, String[]> dropdowns1 = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
         );
         Map<Integer, Integer> widths1 = Map.of(
                 0, 8000,
@@ -221,7 +218,7 @@ public class RoleServiceImpl implements RoleService {
                 }).toList();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH ROLE",
+                        "DANH SÁCH VAI TRÒ",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,
@@ -254,10 +251,15 @@ public class RoleServiceImpl implements RoleService {
                                         richText.applyFont(0, 6, boldFont);
                                         richText.applyFont(7, header.length(), italicFont);
                                     }
-                                    case 2, 3 -> {
+                                    case 2 -> {
                                         richText.applyFont(0, 11, boldFont);
                                         richText.applyFont(11, 13, redBoldFont);
                                         richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                    case 3 -> {
+                                        richText.applyFont(0, 14, boldFont);
+                                        richText.applyFont(14, 16, redBoldFont);
+                                        richText.applyFont(17, header.length(), italicFont);
                                     }
                                 }
                                 cells[i].setCellValue(richText);
@@ -265,10 +267,10 @@ public class RoleServiceImpl implements RoleService {
                         }
                 ),
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH PERMISSION",
-                        "Danh sách permission",
+                        "DANH SÁCH QUYỀN THAO TÁC",
+                        "Danh sách quyền thao tác",
                         headers1,
-                        dropdowns1,
+                        null,
                         widths1,
                         permissionResponses,
                         p -> List.of(
@@ -335,7 +337,7 @@ public class RoleServiceImpl implements RoleService {
                 "Tên * \n(Tối đa 100 kí tự)",
                 "Mô tả \n(Tối đa 255 kí tự)",
                 "Trạng thái * \n(Hoạt động hoặc Không hoạt động)",
-                "Permission * \n(Phải chọn ít nhất 1 permission)"
+                "Quyền thao tác * \n(Phải chọn ít nhất 1 quyền thao tác)"
         );
         Map<Integer, String[]> dropdowns = Map.of(
                 2, new String[]{"Hoạt động", "Không hoạt động"}
@@ -350,9 +352,6 @@ public class RoleServiceImpl implements RoleService {
                 "Tên * \n(Tối đa 50 kí tự)",
                 "Mô tả \n(Tối đa 255 kí tự)",
                 "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, String[]> dropdowns1 = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
         );
         Map<Integer, Integer> widths1 = Map.of(
                 0, 8000,
@@ -369,7 +368,7 @@ public class RoleServiceImpl implements RoleService {
                 }).toList();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH ROLE",
+                        "DANH SÁCH VAI TRÒ",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,
@@ -402,10 +401,15 @@ public class RoleServiceImpl implements RoleService {
                                         richText.applyFont(0, 6, boldFont);
                                         richText.applyFont(7, header.length(), italicFont);
                                     }
-                                    case 2, 3 -> {
+                                    case 2 -> {
                                         richText.applyFont(0, 11, boldFont);
                                         richText.applyFont(11, 13, redBoldFont);
                                         richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                    case 3 -> {
+                                        richText.applyFont(0, 14, boldFont);
+                                        richText.applyFont(14, 16, redBoldFont);
+                                        richText.applyFont(17, header.length(), italicFont);
                                     }
                                 }
                                 cells[i].setCellValue(richText);
@@ -413,10 +417,10 @@ public class RoleServiceImpl implements RoleService {
                         }
                 ),
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH PERMISSION",
-                        "Danh sách permission",
+                        "DANH SÁCH QUYỀN THAO TÁC",
+                        "Danh sách quyền thao tác",
                         headers1,
-                        dropdowns1,
+                        null,
                         widths1,
                         permissionResponses,
                         p -> List.of(

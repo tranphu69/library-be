@@ -163,7 +163,7 @@ public class PermissionSericeImpl implements PermissionService {
         );
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH PERMISSION",
+                        "DANH SÁCH QUYỀN THAO TÁC",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,
@@ -237,7 +237,7 @@ public class PermissionSericeImpl implements PermissionService {
         );
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH PERMISSION",
+                        "DANH SÁCH QUYỀN THAO TÁC",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,

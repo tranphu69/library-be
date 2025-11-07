@@ -6,15 +6,15 @@ import org.springframework.http.HttpStatusCode;
 
 public enum ErrorCode implements BaseErrorCode {
     // ==== System errors (5xxx) ====
-    UNCATEGORIZED_EXCEPTION(5999, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_KEY(5998, "Uncategorized error", HttpStatus.BAD_REQUEST),
+    UNCATEGORIZED_EXCEPTION(5999, "Ngoại lệ chưa phân loại!", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_KEY(5998, "Lỗi chưa phân loại!", HttpStatus.BAD_REQUEST),
     NOT_VALUE(5997, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
-    SYSTEM_ERROR(5000, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
+    SYSTEM_ERROR(5000, "Lỗi máy chủ nội bộ!", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // ==== Auth errors (2xxx) ====
-    AUTH_UNAUTHORIZED(2001, "You are not authorized", HttpStatus.UNAUTHORIZED),
-    AUTH_FORBIDDEN(2002, "You do not have permission", HttpStatus.FORBIDDEN),
-    AUTH_TOKEN_EXPIRED(2003, "Access token has expired", HttpStatus.UNAUTHORIZED),
+    AUTH_UNAUTHORIZED(2001, "Bạn không được ủy quyền!", HttpStatus.UNAUTHORIZED),
+    AUTH_FORBIDDEN(2002, "Bạn không có quyền!", HttpStatus.FORBIDDEN),
+    AUTH_TOKEN_EXPIRED(2003, "Mã thông báo truy cập đã hết hạn!", HttpStatus.UNAUTHORIZED),
     ;
 
     private final int code;

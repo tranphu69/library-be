@@ -33,7 +33,7 @@ public class User {
     private String fullName;
     @Column(length = 100, unique = true)
     private String code; // mã định danh
-    @Pattern(regexp = "^[0-9]{10,11}$")
+    @Pattern(regexp = "^[0-9]{10,12}$")
     @Column(length = 100, unique = true)
     private String phone; // số điện thoại
     @Column(name = "avatar_url")
@@ -126,11 +126,11 @@ public class User {
         this.username = username;
     }
 
-    public @Email String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(@Email String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -158,11 +158,11 @@ public class User {
         this.code = code;
     }
 
-    public @Pattern(regexp = "^[0-9]{10,11}$") String getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(@Pattern(regexp = "^[0-9]{10,11}$") String phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

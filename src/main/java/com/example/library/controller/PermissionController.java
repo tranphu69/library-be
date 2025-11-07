@@ -49,7 +49,7 @@ public class PermissionController {
         List<Long> ids = request.get("list");
         permissionService.delete(ids);
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult("Xóa permission thành công!");
+        apiResponse.setResult("Xóa quyền thao tác thành công!");
         return apiResponse;
     }
 
@@ -92,7 +92,7 @@ public class PermissionController {
     public ApiResponse<?> importPermissions(@RequestParam("file") MultipartFile file) {
         permissionService.importFromExcel(file);
         ApiResponse<?> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Import thành công!");
+        apiResponse.setMessage("Nhập thành công!");
         return apiResponse;
     }
 

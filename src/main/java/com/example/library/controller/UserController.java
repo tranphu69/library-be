@@ -53,7 +53,7 @@ public class UserController {
         List<String> ids = request.get("list");
         userService.delete(ids);
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult("Xóa user thành công!");
+        apiResponse.setResult("Xóa người dùng thành công!");
         return apiResponse;
     }
 
@@ -94,7 +94,7 @@ public class UserController {
     public ApiResponse<?> importUsers(@RequestParam("file")MultipartFile file) {
         userService.importFromExcel(file);
         ApiResponse<?> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Import thành công!");
+        apiResponse.setMessage("Nhập thành công!");
         return apiResponse;
     }
 

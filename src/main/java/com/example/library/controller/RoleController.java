@@ -49,7 +49,7 @@ public class RoleController {
         List<Long> ids = request.get("list");
         roleService.delete(ids);
         ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult("Xóa role thành công!");
+        apiResponse.setResult("Xóa vai trò thành công!");
         return apiResponse;
     }
 
@@ -92,7 +92,7 @@ public class RoleController {
     public ApiResponse<?> importRoles(@RequestParam("file")MultipartFile file) {
         roleService.importFromExcel(file);
         ApiResponse<?> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Import thành công!");
+        apiResponse.setMessage("Nhập thành công!");
         return apiResponse;
     }
 

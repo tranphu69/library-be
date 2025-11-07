@@ -34,7 +34,7 @@ public class UserRequest {
     private String fullName;
     @Size(max = 100, message = "USER_CODE_EXCEED", groups = {OnCreate.class, OnUpdate.class})
     private String code;
-    @Pattern(regexp = "^[0-9]{10,11}$", message = "USER_PHONE_NUMBER", groups = {OnCreate.class, OnUpdate.class})
+    @Pattern(regexp = "^[0-9]{10,12}$", message = "USER_PHONE_NUMBER", groups = {OnCreate.class, OnUpdate.class})
     private String phone;
     @Size(max = 100, message = "USER_CODE_MAJOR", groups = {OnCreate.class, OnUpdate.class})
     private String major;

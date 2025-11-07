@@ -36,8 +36,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +45,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -266,20 +263,20 @@ public class UserServiceImpl implements UserService {
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         List<UserResponse> userResponses = new ArrayList<>();
         List<String> headers = List.of(
-                "username * \n(Tối đa 100 kí tự)",
-                "email * \n(Tối đa 100 kí tự, nhập đúng định dạng email)",
-                "password * \n(Ít nhất 10 và tối đa 16 kí tự, mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt)",
-                "fullname \n(Tối đa 100 kí tự)",
-                "code \n(Tối đa 100 kí tự)",
-                "phone \n(Tối đa 100 kí tự, chỉ nhập số)",
-                "major \n(Tối đa 100 kí tự)",
-                "course \n(Tối đa 100 kí tự)",
-                "position \n(Tối đa 100 kí tự)",
-                "gender \n(Tối đa 100 kí tự)",
-                "dob",
-                "status * \n(Chọn ít nhất 1 trạng thái)",
-                "twoFactorEnabled",
-                "roles * \n(Phải chọn ít nhất 1 role)"
+                "Tên người dùng * \n(Tối đa 100 kí tự)",
+                "Email * \n(Tối đa 100 kí tự, nhập đúng định dạng email)",
+                "Mật khẩu * \n(Ít nhất 10 và tối đa 16 kí tự, mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt)",
+                "Tên đầy đủ \n(Tối đa 100 kí tự)",
+                "Mã \n(Tối đa 100 kí tự)",
+                "Số điện thoại \n(Tối đa 100 kí tự, chỉ nhập số)",
+                "Ngành \n(Tối đa 100 kí tự)",
+                "Khóa \n(Tối đa 100 kí tự)",
+                "Vai trò của người dùng \n(Tối đa 100 kí tự)",
+                "Giới tính \n(Tối đa 100 kí tự)",
+                "Ngày sinh",
+                "Trạng thái * \n(Chọn ít nhất 1 trạng thái)",
+                "Xác thực hai lớp",
+                "Vai trò * \n(Phải chọn ít nhất 1 Vai trò)"
         );
         Map<Integer, String[]> dropdowns = Map.of(
                 8, new String[]{"STUDENT", "LECTURER", "LIBRARIAN", "ADMIN"},
@@ -307,9 +304,6 @@ public class UserServiceImpl implements UserService {
                 "Mô tả \n(Tối đa 255 kí tự)",
                 "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
         );
-        Map<Integer, String[]> dropdowns1 = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
-        );
         Map<Integer, Integer> widths1 = Map.of(
                 0, 8000,
                 1, 12000,
@@ -325,7 +319,7 @@ public class UserServiceImpl implements UserService {
                 }).toList();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH USER",
+                        "DANH SÁCH Người dùng",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,
@@ -359,36 +353,54 @@ public class UserServiceImpl implements UserService {
                                 String header = headers.get(i);
                                 XSSFRichTextString richText = new XSSFRichTextString(header);
                                 switch (i) {
-                                    case 0, 2 -> {
-                                        richText.applyFont(0, 8, boldFont);
-                                        richText.applyFont(8, 10, redBoldFont);
-                                        richText.applyFont(10, header.length(), italicFont);
+                                    case 0 -> {
+                                        richText.applyFont(0, 14, boldFont);
+                                        richText.applyFont(14, 16, redBoldFont);
+                                        richText.applyFont(17, header.length(), italicFont);
                                     }
-                                    case 1, 13 -> {
+                                    case 1 -> {
                                         richText.applyFont(0, 5, boldFont);
                                         richText.applyFont(5, 7, redBoldFont);
                                         richText.applyFont(7, header.length(), italicFont);
                                     }
-                                    case 11 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(6, 8, redBoldFont);
-                                        richText.applyFont(9, header.length(), italicFont);
-                                    }
-                                    case 3, 8 -> {
+                                    case 2 -> {
                                         richText.applyFont(0, 8, boldFont);
-                                        richText.applyFont(9, header.length(), italicFont);
+                                        richText.applyFont(8, 10, redBoldFont);
+                                        richText.applyFont(11, header.length(), italicFont);
+                                    }
+                                    case 11 -> {
+                                        richText.applyFont(0, 10, boldFont);
+                                        richText.applyFont(10, 12, redBoldFont);
+                                        richText.applyFont(13, header.length(), italicFont);
+                                    }
+                                    case 13 -> {
+                                        richText.applyFont(0, 7, boldFont);
+                                        richText.applyFont(7, 9, redBoldFont);
+                                        richText.applyFont(10, header.length(), italicFont);
+                                    }
+                                    case 3, 9 -> {
+                                        richText.applyFont(0, 10, boldFont);
+                                        richText.applyFont(11, header.length(), italicFont);
                                     }
                                     case 4 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(5, header.length(), italicFont);
+                                        richText.applyFont(0, 2, boldFont);
+                                        richText.applyFont(3, header.length(), italicFont);
                                     }
-                                    case 5, 6 -> {
+                                    case 5 -> {
+                                        richText.applyFont(0, 13, boldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                    case 6 -> {
                                         richText.applyFont(0, 5, boldFont);
                                         richText.applyFont(6, header.length(), italicFont);
                                     }
-                                    case 7, 9 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
+                                    case 7 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(5, header.length(), italicFont);
+                                    }
+                                    case 8 -> {
+                                        richText.applyFont(0, 22, boldFont);
+                                        richText.applyFont(23, header.length(), italicFont);
                                     }
                                     case 10, 12 -> {
                                         richText.applyFont(boldFont);
@@ -399,10 +411,10 @@ public class UserServiceImpl implements UserService {
                         }
                 ),
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH ROLE",
-                        "Danh sách role",
+                        "DANH SÁCH VAI TRÒ",
+                        "Danh sách vai trò",
                         headers1,
-                        dropdowns1,
+                        null,
                         widths1,
                         roleResponses,
                         r -> List.of(
@@ -476,19 +488,20 @@ public class UserServiceImpl implements UserService {
         );
         List<UserResponse> userResponses = getListUser(userPage);
         List<String> headers = List.of(
-                "username * \n(Tối đa 100 kí tự)",
-                "email * \n(Tối đa 100 kí tự, nhập đúng định dạng email)",
-                "fullname \n(Tối đa 100 kí tự)",
-                "code \n(Tối đa 100 kí tự)",
-                "phone \n(Tối đa 100 kí tự, chỉ nhập số)",
-                "major \n(Tối đa 100 kí tự)",
-                "course \n(Tối đa 100 kí tự)",
-                "position \n(Tối đa 100 kí tự)",
-                "gender \n(Tối đa 100 kí tự)",
-                "dob",
-                "status * \n(Chọn ít nhất 1 trạng thái)",
-                "twoFactorEnabled",
-                "roles * \n(Phải chọn ít nhất 1 role)"
+                "Tên người dùng * \n(Tối đa 100 kí tự)",
+                "Email * \n(Tối đa 100 kí tự, nhập đúng định dạng email)",
+                "Mật khẩu * \n(Ít nhất 10 và tối đa 16 kí tự, mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt)",
+                "Tên đầy đủ \n(Tối đa 100 kí tự)",
+                "Mã \n(Tối đa 100 kí tự)",
+                "Số điện thoại \n(Tối đa 100 kí tự, chỉ nhập số)",
+                "Ngành \n(Tối đa 100 kí tự)",
+                "Khóa \n(Tối đa 100 kí tự)",
+                "Vai trò của người dùng \n(Tối đa 100 kí tự)",
+                "Giới tính \n(Tối đa 100 kí tự)",
+                "Ngày sinh",
+                "Trạng thái * \n(Chọn ít nhất 1 trạng thái)",
+                "Xác thực hai lớp",
+                "Vai trò * \n(Phải chọn ít nhất 1 Vai trò)"
         );
         Map<Integer, String[]> dropdowns = Map.of(
                 7, new String[]{"STUDENT", "LECTURER", "LIBRARIAN", "ADMIN"},
@@ -497,8 +510,8 @@ public class UserServiceImpl implements UserService {
         );
         Map<Integer, Integer> widths = Map.ofEntries(
                 Map.entry(0, 7000),
-                Map.entry(1, 12000),
-                Map.entry(2, 7000),
+                Map.entry(1, 7000),
+                Map.entry(2, 12000),
                 Map.entry(3, 7000),
                 Map.entry(4, 7000),
                 Map.entry(5, 9000),
@@ -515,9 +528,6 @@ public class UserServiceImpl implements UserService {
                 "Mô tả \n(Tối đa 255 kí tự)",
                 "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
         );
-        Map<Integer, String[]> dropdowns1 = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
-        );
         Map<Integer, Integer> widths1 = Map.of(
                 0, 8000,
                 1, 12000,
@@ -533,7 +543,7 @@ public class UserServiceImpl implements UserService {
                 }).toList();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH USER",
+                        "DANH SÁCH NGƯỜI DÙNG",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,
@@ -567,37 +577,55 @@ public class UserServiceImpl implements UserService {
                                 XSSFRichTextString richText = new XSSFRichTextString(header);
                                 switch (i) {
                                     case 0 -> {
-                                        richText.applyFont(0, 8, boldFont);
-                                        richText.applyFont(8, 10, redBoldFont);
-                                        richText.applyFont(10, header.length(), italicFont);
+                                        richText.applyFont(0, 14, boldFont);
+                                        richText.applyFont(14, 16, redBoldFont);
+                                        richText.applyFont(17, header.length(), italicFont);
                                     }
-                                    case 1, 12 -> {
+                                    case 1 -> {
                                         richText.applyFont(0, 5, boldFont);
                                         richText.applyFont(5, 7, redBoldFont);
                                         richText.applyFont(7, header.length(), italicFont);
                                     }
-                                    case 10 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(6, 8, redBoldFont);
-                                        richText.applyFont(9, header.length(), italicFont);
-                                    }
-                                    case 2, 7 -> {
+                                    case 2 -> {
                                         richText.applyFont(0, 8, boldFont);
-                                        richText.applyFont(9, header.length(), italicFont);
+                                        richText.applyFont(8, 10, redBoldFont);
+                                        richText.applyFont(11, header.length(), italicFont);
                                     }
-                                    case 3 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(5, header.length(), italicFont);
+                                    case 11 -> {
+                                        richText.applyFont(0, 10, boldFont);
+                                        richText.applyFont(10, 12, redBoldFont);
+                                        richText.applyFont(13, header.length(), italicFont);
                                     }
-                                    case 4, 5 -> {
+                                    case 13 -> {
+                                        richText.applyFont(0, 7, boldFont);
+                                        richText.applyFont(7, 9, redBoldFont);
+                                        richText.applyFont(10, header.length(), italicFont);
+                                    }
+                                    case 3, 9 -> {
+                                        richText.applyFont(0, 10, boldFont);
+                                        richText.applyFont(11, header.length(), italicFont);
+                                    }
+                                    case 4 -> {
+                                        richText.applyFont(0, 2, boldFont);
+                                        richText.applyFont(3, header.length(), italicFont);
+                                    }
+                                    case 5 -> {
+                                        richText.applyFont(0, 13, boldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                    case 6 -> {
                                         richText.applyFont(0, 5, boldFont);
                                         richText.applyFont(6, header.length(), italicFont);
                                     }
-                                    case 6, 8 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
+                                    case 7 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(5, header.length(), italicFont);
                                     }
-                                    case 9, 11 -> {
+                                    case 8 -> {
+                                        richText.applyFont(0, 22, boldFont);
+                                        richText.applyFont(23, header.length(), italicFont);
+                                    }
+                                    case 10, 12 -> {
                                         richText.applyFont(boldFont);
                                     }
                                 }
@@ -606,10 +634,10 @@ public class UserServiceImpl implements UserService {
                         }
                 ),
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH ROLE",
-                        "Danh sách role",
+                        "DANH SÁCH VAI TRÒ",
+                        "Danh sách vai trò",
                         headers1,
-                        dropdowns1,
+                        null,
                         widths1,
                         roleResponses,
                         r -> List.of(
@@ -801,7 +829,7 @@ public class UserServiceImpl implements UserService {
         );
         String type = keyword.getType().trim();
         if (!columnMapping.containsKey(type)) {
-            throw new IllegalArgumentException("Invalid type: " + type);
+            throw new IllegalArgumentException("Loại không hợp lệ: " + type);
         }
         String column = columnMapping.get(type);
         String sql = "SELECT DISTINCT " + column +
