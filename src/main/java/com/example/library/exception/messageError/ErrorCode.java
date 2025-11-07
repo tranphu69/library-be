@@ -9,6 +9,7 @@ public enum ErrorCode implements BaseErrorCode {
     UNCATEGORIZED_EXCEPTION(5999, "Ngoại lệ chưa phân loại!", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(5998, "Lỗi chưa phân loại!", HttpStatus.BAD_REQUEST),
     NOT_VALUE(5997, "Giá trị không hợp lệ!", HttpStatus.BAD_REQUEST),
+    ERROR_FILE(5996, "Tài liệu lỗi!", HttpStatus.BAD_REQUEST),
     SYSTEM_ERROR(5000, "Lỗi máy chủ nội bộ!", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // ==== Auth errors (2xxx) ====

@@ -41,6 +41,67 @@ public class PermissionSericeImpl implements PermissionService {
     private Validator validator;
     @Autowired
     private RoleRepository roleRepository;
+    private final List<String> headers = List.of(
+            "Tên * \n(Tối đa 100 kí tự)",
+            "Mô tả \n(Tối đa 255 kí tự)",
+            "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
+    );
+    private final Map<Integer, String[]> dropdowns = Map.of(
+            2, new String[]{"Hoạt động", "Không hoạt động"}
+    );
+    private final Map<Integer, Integer> widths = Map.of(
+            0, 8000,
+            1, 12000,
+            2, 10000
+    );
+
+    private List<UtilsExcel.ExcelSheetConfig<?>> buildPermissionSheets(List<PermissionResponse> permissionResponses) {
+        return List.of(
+                new UtilsExcel.ExcelSheetConfig<>(
+                        "DANH SÁCH QUYỀN THAO TÁC",
+                        "Thông tin danh sách",
+                        headers,
+                        dropdowns,
+                        widths,
+                        permissionResponses,
+                        p -> List.of(
+                                p.getName(),
+                                p.getDescription(),
+                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
+                        ),
+                        (workbook, cells) -> {
+                            Font boldFont = workbook.createFont();
+                            boldFont.setBold(true);
+                            Font redBoldFont = workbook.createFont();
+                            redBoldFont.setBold(true);
+                            redBoldFont.setColor(IndexedColors.RED.getIndex());
+                            Font italicFont = workbook.createFont();
+                            italicFont.setItalic(true);
+                            for (int i = 0; i < headers.size(); i++) {
+                                String header = headers.get(i);
+                                XSSFRichTextString richText = new XSSFRichTextString(header);
+                                switch (i) {
+                                    case 0 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(4, 5, redBoldFont);
+                                        richText.applyFont(6, header.length(), italicFont);
+                                    }
+                                    case 1 -> {
+                                        richText.applyFont(0, 6, boldFont);
+                                        richText.applyFont(7, header.length(), italicFont);
+                                    }
+                                    case 2 -> {
+                                        richText.applyFont(0, 11, boldFont);
+                                        richText.applyFont(11, 13, redBoldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                }
+                                cells[i].setCellValue(richText);
+                            }
+                        }
+                )
+        );
+    }
 
     private List<PermissionResponse> getListPermission(Page<Permission> permissionPage) {
         return permissionPage.getContent()
@@ -148,64 +209,7 @@ public class PermissionSericeImpl implements PermissionService {
     @Override
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         List<PermissionResponse> permissionResponses = new ArrayList<>();
-        List<String> headers = List.of(
-                "Tên * \n(Tối đa 100 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, String[]> dropdowns = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
-        );
-        Map<Integer, Integer> widths = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000
-        );
-        List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH QUYỀN THAO TÁC",
-                        "Thông tin danh sách",
-                        headers,
-                        dropdowns,
-                        widths,
-                        permissionResponses,
-                        p -> List.of(
-                                p.getName(),
-                                p.getDescription(),
-                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers.size(); i++) {
-                                String header = headers.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-                )
-        );
+        List<UtilsExcel.ExcelSheetConfig<?>> sheets = buildPermissionSheets(permissionResponses);
         UtilsExcel.exportToExcel(
                 response,
                 sheets
@@ -222,64 +226,7 @@ public class PermissionSericeImpl implements PermissionService {
                 pageable
         );
         List<PermissionResponse> permissionResponses = getListPermission(permissionPage);
-        List<String> headers = List.of(
-                "Tên * \n(Tối đa 50 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, String[]> dropdowns = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
-        );
-        Map<Integer, Integer> widths = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000
-        );
-        List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH QUYỀN THAO TÁC",
-                        "Thông tin danh sách",
-                        headers,
-                        dropdowns,
-                        widths,
-                        permissionResponses,
-                        p -> List.of(
-                                p.getName(),
-                                p.getDescription(),
-                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers.size(); i++) {
-                                String header = headers.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-                )
-        );
+        List<UtilsExcel.ExcelSheetConfig<?>> sheets = buildPermissionSheets(permissionResponses);
         UtilsExcel.exportToExcel(
                 response,
                 sheets
@@ -308,12 +255,7 @@ public class PermissionSericeImpl implements PermissionService {
                 if (!violations.isEmpty()) {
                     throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
-                if (!excelNames.add(request.getName())){
-                    throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
-                }
-                if (existingNames.contains(request.getName())){
-                    throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
-                }
+                Utils.checkDuplicate(request.getName(), existingNames, excelNames);
                 Permission permission = new Permission();
                 permission.setName(request.getName());
                 permission.setDescription(request.getDescription());

@@ -1,6 +1,5 @@
 package com.example.library.repository;
 
-import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

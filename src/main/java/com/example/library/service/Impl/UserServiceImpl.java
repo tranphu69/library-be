@@ -36,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.library.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +54,16 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
     @Autowired
     private EntityManager entityManager;
+    private final List<String> headers1 = List.of(
+            "Tên * \n(Tối đa 50 kí tự)",
+            "Mô tả \n(Tối đa 255 kí tự)",
+            "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
+    );
+    private final Map<Integer, Integer> widths1 = Map.of(
+            0, 8000,
+            1, 12000,
+            2, 10000
+    );
 
     private List<UserResponse> getListUser(Page<User> userPage) {
         return userPage.getContent()
@@ -93,6 +104,97 @@ public class UserServiceImpl implements UserService {
                     return response;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private User getUser(UserRequest request, Set<Role> roles) {
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setFullName(!request.getFullName().isEmpty() ? request.getFullName().trim() : null);
+        user.setCode(!request.getCode().isEmpty() ? request.getCode().trim() : null);
+        user.setPhone(!request.getPhone().isEmpty() ? request.getPhone() : null);
+        user.setMajor(!request.getMajor().isEmpty() ? request.getMajor().trim() : null);
+        user.setCourse(!request.getCourse().isEmpty() ? request.getCourse().trim() : null);
+        user.setAvatarUrl(request.getAvatarUrl());
+        user.setPosition(request.getPosition());
+        user.setGender(request.getGender());
+        user.setDob(request.getDob());
+        user.setStatus(request.getStatus());
+        user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        user.setRoles(new HashSet<>(roles));
+        return user;
+    }
+
+    private String getString(UserAutoSearch keyword) {
+        Map<String, String> columnMapping = Map.of(
+                "username", "username",
+                "email", "email",
+                "fullName", "full_name",
+                "code", "code",
+                "phone", "phone",
+                "major", "major",
+                "course", "course"
+        );
+        String type = keyword.getType().trim();
+        if (!columnMapping.containsKey(type)) {
+            throw new IllegalArgumentException("Loại không hợp lệ: " + type);
+        }
+        return columnMapping.get(type);
+    }
+
+    private UtilsExcel.ExcelSheetConfig<?> buildRoleSheets() {
+        List<RoleResponse> roleResponses = roleRepository.findAllStatus1()
+                .stream().map(r -> {
+                    RoleResponse roleResponse = new RoleResponse();
+                    roleResponse.setName(r.getName());
+                    roleResponse.setDescription(r.getDescription());
+                    roleResponse.setAction(r.getAction());
+                    return roleResponse;
+                }).toList();
+        return new UtilsExcel.ExcelSheetConfig<> (
+                "DANH SÁCH VAI TRÒ",
+                "Danh sách vai trò",
+                headers1,
+                null,
+                widths1,
+                roleResponses,
+                r -> List.of(
+                        r.getName(),
+                        r.getDescription(),
+                        r.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
+                ),
+                (workbook, cells) -> {
+                    Font boldFont = workbook.createFont();
+                    boldFont.setBold(true);
+                    Font redBoldFont = workbook.createFont();
+                    redBoldFont.setBold(true);
+                    redBoldFont.setColor(IndexedColors.RED.getIndex());
+                    Font italicFont = workbook.createFont();
+                    italicFont.setItalic(true);
+                    for (int i = 0; i < headers1.size(); i++) {
+                        String header = headers1.get(i);
+                        XSSFRichTextString richText = new XSSFRichTextString(header);
+                        switch (i) {
+                            case 0 -> {
+                                richText.applyFont(0, 4, boldFont);
+                                richText.applyFont(4, 5, redBoldFont);
+                                richText.applyFont(6, header.length(), italicFont);
+                            }
+                            case 1 -> {
+                                richText.applyFont(0, 6, boldFont);
+                                richText.applyFont(7, header.length(), italicFont);
+                            }
+                            case 2 -> {
+                                richText.applyFont(0, 11, boldFont);
+                                richText.applyFont(11, 13, redBoldFont);
+                                richText.applyFont(14, header.length(), italicFont);
+                            }
+                        }
+                        cells[i].setCellValue(richText);
+                    }
+                }
+        );
     }
 
     @Override
@@ -299,27 +401,9 @@ public class UserServiceImpl implements UserService {
                 Map.entry(12, 7000),
                 Map.entry(13, 7000)
         );
-        List<String> headers1 = List.of(
-                "Tên * \n(Tối đa 50 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, Integer> widths1 = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000
-        );
-        List<RoleResponse> roleResponses = roleRepository.findAllStatus1()
-                .stream().map(r -> {
-                    RoleResponse roleResponse = new RoleResponse();
-                    roleResponse.setName(r.getName());
-                    roleResponse.setDescription(r.getDescription());
-                    roleResponse.setAction(r.getAction());
-                    return roleResponse;
-                }).toList();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH Người dùng",
+                        "DANH SÁCH NGƯỜI DÙNG",
                         "Thông tin danh sách",
                         headers,
                         dropdowns,
@@ -410,50 +494,7 @@ public class UserServiceImpl implements UserService {
                             }
                         }
                 ),
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH VAI TRÒ",
-                        "Danh sách vai trò",
-                        headers1,
-                        null,
-                        widths1,
-                        roleResponses,
-                        r -> List.of(
-                                r.getName(),
-                                r.getDescription(),
-                                r.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers1.size(); i++) {
-                                String header = headers1.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-
-                )
+                buildRoleSheets()
         );
         UtilsExcel.exportToExcel(
                 response,
@@ -490,7 +531,6 @@ public class UserServiceImpl implements UserService {
         List<String> headers = List.of(
                 "Tên người dùng * \n(Tối đa 100 kí tự)",
                 "Email * \n(Tối đa 100 kí tự, nhập đúng định dạng email)",
-                "Mật khẩu * \n(Ít nhất 10 và tối đa 16 kí tự, mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt)",
                 "Tên đầy đủ \n(Tối đa 100 kí tự)",
                 "Mã \n(Tối đa 100 kí tự)",
                 "Số điện thoại \n(Tối đa 100 kí tự, chỉ nhập số)",
@@ -511,10 +551,10 @@ public class UserServiceImpl implements UserService {
         Map<Integer, Integer> widths = Map.ofEntries(
                 Map.entry(0, 7000),
                 Map.entry(1, 7000),
-                Map.entry(2, 12000),
+                Map.entry(2, 7000),
                 Map.entry(3, 7000),
-                Map.entry(4, 7000),
-                Map.entry(5, 9000),
+                Map.entry(4, 9000),
+                Map.entry(5, 7000),
                 Map.entry(6, 7000),
                 Map.entry(7, 7000),
                 Map.entry(8, 7000),
@@ -523,24 +563,6 @@ public class UserServiceImpl implements UserService {
                 Map.entry(11, 7000),
                 Map.entry(12, 7000)
         );
-        List<String> headers1 = List.of(
-                "Tên * \n(Tối đa 50 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, Integer> widths1 = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000
-        );
-        List<RoleResponse> roleResponses = roleRepository.findAllStatus1()
-                .stream().map(r -> {
-                    RoleResponse roleResponse = new RoleResponse();
-                    roleResponse.setName(r.getName());
-                    roleResponse.setDescription(r.getDescription());
-                    roleResponse.setAction(r.getAction());
-                    return roleResponse;
-                }).toList();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
                 new UtilsExcel.ExcelSheetConfig<>(
                         "DANH SÁCH NGƯỜI DÙNG",
@@ -586,46 +608,41 @@ public class UserServiceImpl implements UserService {
                                         richText.applyFont(5, 7, redBoldFont);
                                         richText.applyFont(7, header.length(), italicFont);
                                     }
-                                    case 2 -> {
-                                        richText.applyFont(0, 8, boldFont);
-                                        richText.applyFont(8, 10, redBoldFont);
-                                        richText.applyFont(11, header.length(), italicFont);
-                                    }
-                                    case 11 -> {
+                                    case 10 -> {
                                         richText.applyFont(0, 10, boldFont);
                                         richText.applyFont(10, 12, redBoldFont);
                                         richText.applyFont(13, header.length(), italicFont);
                                     }
-                                    case 13 -> {
+                                    case 12 -> {
                                         richText.applyFont(0, 7, boldFont);
                                         richText.applyFont(7, 9, redBoldFont);
                                         richText.applyFont(10, header.length(), italicFont);
                                     }
-                                    case 3, 9 -> {
+                                    case 2, 8 -> {
                                         richText.applyFont(0, 10, boldFont);
                                         richText.applyFont(11, header.length(), italicFont);
                                     }
-                                    case 4 -> {
+                                    case 3 -> {
                                         richText.applyFont(0, 2, boldFont);
                                         richText.applyFont(3, header.length(), italicFont);
                                     }
-                                    case 5 -> {
+                                    case 4 -> {
                                         richText.applyFont(0, 13, boldFont);
                                         richText.applyFont(14, header.length(), italicFont);
                                     }
-                                    case 6 -> {
+                                    case 5 -> {
                                         richText.applyFont(0, 5, boldFont);
                                         richText.applyFont(6, header.length(), italicFont);
                                     }
-                                    case 7 -> {
+                                    case 6 -> {
                                         richText.applyFont(0, 4, boldFont);
                                         richText.applyFont(5, header.length(), italicFont);
                                     }
-                                    case 8 -> {
+                                    case 7 -> {
                                         richText.applyFont(0, 22, boldFont);
                                         richText.applyFont(23, header.length(), italicFont);
                                     }
-                                    case 10, 12 -> {
+                                    case 9, 11 -> {
                                         richText.applyFont(boldFont);
                                     }
                                 }
@@ -633,69 +650,12 @@ public class UserServiceImpl implements UserService {
                             }
                         }
                 ),
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH VAI TRÒ",
-                        "Danh sách vai trò",
-                        headers1,
-                        null,
-                        widths1,
-                        roleResponses,
-                        r -> List.of(
-                                r.getName(),
-                                r.getDescription(),
-                                r.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers1.size(); i++) {
-                                String header = headers1.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-
-                )
+                buildRoleSheets()
         );
         UtilsExcel.exportToExcel(
                 response,
                 sheets
         );
-    }
-
-    public static String getCellValue(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue().trim();
-            case NUMERIC:
-                return new java.math.BigDecimal(cell.getNumericCellValue()).toPlainString();
-            default:
-                return "";
-        }
     }
 
     @Override
@@ -720,19 +680,21 @@ public class UserServiceImpl implements UserService {
             for(int i = 4; i <= lastRow; i++) {
                 Row row = sheet.getRow(i);
                 if(UtilsExcel.isRowEmpty(row)) continue;
+                List<String> values = new ArrayList<>();
+                for (int c = 0; c <= 13; c++) {
+                    values.add(UtilsExcel.getCellValue(row.getCell(c)).trim());
+                }
                 UserRequest request = new UserRequest();
-                request.setUsername(UtilsExcel.getCellValue(row.getCell(0)));
-                request.setEmail(UtilsExcel.getCellValue(row.getCell(1)));
-                request.setPassword(UtilsExcel.getCellValue(row.getCell(2)));
-                request.setFullName(UtilsExcel.getCellValue(row.getCell(3)));
-                request.setCode(UtilsExcel.getCellValue(row.getCell(4)));
-                request.setPhone(getCellValue(row.getCell(5)));
-                request.setMajor(UtilsExcel.getCellValue(row.getCell(6)));
-                request.setCourse(UtilsExcel.getCellValue(row.getCell(7)));
-                Position newPosition = UtilsExcel.getCellValue(row.getCell(8)) != null && !UtilsExcel.getCellValue(row.getCell(8)).isEmpty() ? Position.valueOf(UtilsExcel.getCellValue(row.getCell(8)).trim()) : null;
-                request.setPosition(newPosition);
-                Gender newGender = UtilsExcel.getCellValue(row.getCell(9)) != null && !UtilsExcel.getCellValue(row.getCell(9)).isEmpty() ? Gender.valueOf(UtilsExcel.getCellValue(row.getCell(9)).trim()) : null;
-                request.setGender(newGender);
+                request.setUsername(values.get(0));
+                request.setEmail(values.get(1));
+                request.setPassword(values.get(2));
+                request.setFullName(values.get(3));
+                request.setCode(values.get(4));
+                request.setPhone(Utils.getCellValue(row.getCell(5)));
+                request.setMajor(values.get(6));
+                request.setCourse(values.get(7));
+                request.setPosition(values.get(8) != null && !values.get(8).isEmpty() ? Position.valueOf(values.get(8)) : null);
+                request.setGender(values.get(9) != null && !values.get(9).isEmpty() ? Gender.valueOf(values.get(9)) : null);
                 Cell cell = row.getCell(10);
                 LocalDate newDate = null;
                 if (cell != null) {
@@ -740,17 +702,15 @@ public class UserServiceImpl implements UserService {
                         newDate = cell.getLocalDateTimeCellValue().toLocalDate();
                     } else {
                         String raw = UtilsExcel.getCellValue(cell);
-                        if (raw != null && !raw.trim().isEmpty()) {
-                            newDate = LocalDate.parse(raw.trim());
+                        if (raw != null && !raw.isEmpty()) {
+                            newDate = LocalDate.parse(raw);
                         }
                     }
                 }
                 request.setDob(newDate);
-                AccountStatus newStatus = UtilsExcel.getCellValue(row.getCell(11)) != null && !UtilsExcel.getCellValue(row.getCell(11)).isEmpty() ? AccountStatus.valueOf(UtilsExcel.getCellValue(row.getCell(11)).trim()) : null;
-                request.setStatus(newStatus);
-                Boolean newTwoFactorEnabled = UtilsExcel.getCellValue(row.getCell(12)) != null && !UtilsExcel.getCellValue(row.getCell(12)).trim().isEmpty() ? Boolean.valueOf(UtilsExcel.getCellValue(row.getCell(12)).trim()) : false;
-                request.setTwoFactorEnabled(newTwoFactorEnabled);
-                String roleStr = UtilsExcel.getCellValue(row.getCell(13));
+                request.setStatus(values.get(11) != null && !values.get(11).isEmpty() ? AccountStatus.valueOf(values.get(11)) : null);
+                request.setTwoFactorEnabled(values.get(12) != null && !values.get(12).trim().isEmpty() && Boolean.parseBoolean(values.get(12)));
+                String roleStr = values.get(13);
                 List<String> roleArr = Arrays.stream(roleStr.split(","))
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
@@ -764,46 +724,11 @@ public class UserServiceImpl implements UserService {
                 if (!violations.isEmpty()) {
                     throw new AppException(UserErrorCode.USER_ERROR_FILE);
                 }
-                if (!excelUsernames.add(request.getUsername())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (existingUsernames.contains(request.getUsername())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (!excelEmails.add(request.getEmail())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (existingEmails.contains(request.getEmail())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (!excelCodes.add(request.getCode())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (existingCodes.contains(request.getCode())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (!excelPhones.add(request.getPhone())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                if (existingPhones.contains(request.getPhone())) {
-                    throw new AppException(UserErrorCode.USER_ERROR_FILE);
-                }
-                User user = new User();
-                user.setUsername(request.getUsername());
-                user.setEmail(request.getEmail());
-                user.setPassword(request.getPassword());
-                user.setFullName(!request.getFullName().isEmpty() ? request.getFullName().trim() : null);
-                user.setCode(!request.getCode().isEmpty() ? request.getCode().trim() : null);
-                user.setPhone(!request.getPhone().isEmpty() ? request.getPhone() : null);
-                user.setMajor(!request.getMajor().isEmpty() ? request.getMajor().trim() : null);
-                user.setCourse(!request.getCourse().isEmpty() ? request.getCourse().trim() : null);
-                user.setAvatarUrl(request.getAvatarUrl());
-                user.setPosition(request.getPosition());
-                user.setGender(request.getGender());
-                user.setDob(request.getDob());
-                user.setStatus(request.getStatus());
-                user.setTwoFactorEnabled(Boolean.valueOf(request.getTwoFactorEnabled()));
-                user.setRoles(new HashSet<>(roles));
+                Utils.checkDuplicate(request.getUsername(), existingUsernames, excelUsernames);
+                Utils.checkDuplicate(request.getEmail(), existingEmails, excelEmails);
+                Utils.checkDuplicate(request.getCode(), existingCodes, excelCodes);
+                Utils.checkDuplicate(request.getPhone(), existingPhones, excelPhones);
+                User user = getUser(request, roles);
                 users.add(user);
             }
             userRepository.saveAll(users);
@@ -818,20 +743,7 @@ public class UserServiceImpl implements UserService {
         if (keyword.getKeyword() == null || keyword.getKeyword().trim().isEmpty() || keyword.getType() == null || keyword.getType().trim().isEmpty()) {
             return Collections.emptyList();
         }
-        Map<String, String> columnMapping = Map.of(
-                "username", "username",
-                "email", "email",
-                "fullName", "full_name",
-                "code", "code",
-                "phone", "phone",
-                "major", "major",
-                "course", "course"
-        );
-        String type = keyword.getType().trim();
-        if (!columnMapping.containsKey(type)) {
-            throw new IllegalArgumentException("Loại không hợp lệ: " + type);
-        }
-        String column = columnMapping.get(type);
+        String column = getString(keyword);
         String sql = "SELECT DISTINCT " + column +
                 " FROM users WHERE LOWER(" + column + ") LIKE LOWER(CONCAT('%', :keyword, '%'))";
         Query query = entityManager.createNativeQuery(sql);

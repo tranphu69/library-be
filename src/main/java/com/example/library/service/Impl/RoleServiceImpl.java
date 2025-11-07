@@ -44,6 +44,137 @@ public class RoleServiceImpl implements RoleService {
     private Validator validator;
     @Autowired
     private PermissionRepository permissionRepository;
+    private final List<String> headers = List.of(
+            "Tên * \n(Tối đa 100 kí tự)",
+            "Mô tả \n(Tối đa 255 kí tự)",
+            "Trạng thái * \n(Hoạt động hoặc Không hoạt động)",
+            "Quyền thao tác * \n(Phải chọn ít nhất 1 quyền thao tác)"
+    );
+    private final Map<Integer, String[]> dropdowns = Map.of(
+            2, new String[]{"Hoạt động", "Không hoạt động"}
+    );
+    private final Map<Integer, Integer> widths = Map.of(
+            0, 8000,
+            1, 12000,
+            2, 10000,
+            3, 12000
+    );
+    private final List<String> headers1 = List.of(
+            "Tên * \n(Tối đa 50 kí tự)",
+            "Mô tả \n(Tối đa 255 kí tự)",
+            "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
+    );
+    private final Map<Integer, Integer> widths1 = Map.of(
+            0, 8000,
+            1, 12000,
+            2, 10000
+    );
+
+    private List<UtilsExcel.ExcelSheetConfig<?>> buildRoleSheets(List<RoleResponse> roleResponses) {
+        List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
+                .stream().map(p -> {
+                    PermissionResponse permissionResponse = new PermissionResponse();
+                    permissionResponse.setName(p.getName());
+                    permissionResponse.setDescription(p.getDescription());
+                    permissionResponse.setAction(p.getAction());
+                    return permissionResponse;
+                }).toList();
+        return List.of(
+                new UtilsExcel.ExcelSheetConfig<>(
+                        "DANH SÁCH VAI TRÒ",
+                        "Thông tin danh sách",
+                        headers,
+                        dropdowns,
+                        widths,
+                        roleResponses,
+                        p -> List.of(
+                                p.getName(),
+                                p.getDescription(),
+                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động",
+                                p.getPermissions().stream().map(NoAction::getName).collect(Collectors.joining(", "))
+                        ),
+                        (workbook, cells) -> {
+                            Font boldFont = workbook.createFont();
+                            boldFont.setBold(true);
+                            Font redBoldFont = workbook.createFont();
+                            redBoldFont.setBold(true);
+                            redBoldFont.setColor(IndexedColors.RED.getIndex());
+                            Font italicFont = workbook.createFont();
+                            italicFont.setItalic(true);
+                            for (int i = 0; i < headers.size(); i++) {
+                                String header = headers.get(i);
+                                XSSFRichTextString richText = new XSSFRichTextString(header);
+                                switch (i) {
+                                    case 0 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(4, 5, redBoldFont);
+                                        richText.applyFont(6, header.length(), italicFont);
+                                    }
+                                    case 1 -> {
+                                        richText.applyFont(0, 6, boldFont);
+                                        richText.applyFont(7, header.length(), italicFont);
+                                    }
+                                    case 2 -> {
+                                        richText.applyFont(0, 11, boldFont);
+                                        richText.applyFont(11, 13, redBoldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                    case 3 -> {
+                                        richText.applyFont(0, 14, boldFont);
+                                        richText.applyFont(14, 16, redBoldFont);
+                                        richText.applyFont(17, header.length(), italicFont);
+                                    }
+                                }
+                                cells[i].setCellValue(richText);
+                            }
+                        }
+                ),
+                new UtilsExcel.ExcelSheetConfig<>(
+                        "DANH SÁCH QUYỀN THAO TÁC",
+                        "Danh sách quyền thao tác",
+                        headers1,
+                        null,
+                        widths1,
+                        permissionResponses,
+                        p -> List.of(
+                                p.getName(),
+                                p.getDescription(),
+                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
+                        ),
+                        (workbook, cells) -> {
+                            Font boldFont = workbook.createFont();
+                            boldFont.setBold(true);
+                            Font redBoldFont = workbook.createFont();
+                            redBoldFont.setBold(true);
+                            redBoldFont.setColor(IndexedColors.RED.getIndex());
+                            Font italicFont = workbook.createFont();
+                            italicFont.setItalic(true);
+                            for (int i = 0; i < headers1.size(); i++) {
+                                String header = headers1.get(i);
+                                XSSFRichTextString richText = new XSSFRichTextString(header);
+                                switch (i) {
+                                    case 0 -> {
+                                        richText.applyFont(0, 4, boldFont);
+                                        richText.applyFont(4, 5, redBoldFont);
+                                        richText.applyFont(6, header.length(), italicFont);
+                                    }
+                                    case 1 -> {
+                                        richText.applyFont(0, 6, boldFont);
+                                        richText.applyFont(7, header.length(), italicFont);
+                                    }
+                                    case 2 -> {
+                                        richText.applyFont(0, 11, boldFont);
+                                        richText.applyFont(11, 13, redBoldFont);
+                                        richText.applyFont(14, header.length(), italicFont);
+                                    }
+                                }
+                                cells[i].setCellValue(richText);
+                            }
+                        }
+
+                )
+        );
+    }
 
     private List<RoleResponse> getListRole(Page<Role> rolePage) {
         return rolePage.getContent()
@@ -183,134 +314,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         List<RoleResponse> roleResponses = new ArrayList<>();
-        List<String> headers = List.of(
-                "Tên * \n(Tối đa 100 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)",
-                "Quyền thao tác * \n(Phải chọn ít nhất 1 quyền thao tác)"
-        );
-        Map<Integer, String[]> dropdowns = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
-        );
-        Map<Integer, Integer> widths = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000,
-                3, 12000
-        );
-        List<String> headers1 = List.of(
-                "Tên * \n(Tối đa 50 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, Integer> widths1 = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000
-        );
-        List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
-                .stream().map(p -> {
-                    PermissionResponse permissionResponse = new PermissionResponse();
-                    permissionResponse.setName(p.getName());
-                    permissionResponse.setDescription(p.getDescription());
-                    permissionResponse.setAction(p.getAction());
-                    return permissionResponse;
-                }).toList();
-        List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH VAI TRÒ",
-                        "Thông tin danh sách",
-                        headers,
-                        dropdowns,
-                        widths,
-                        roleResponses,
-                        p -> List.of(
-                                p.getName(),
-                                p.getDescription(),
-                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động",
-                                p.getPermissions().stream().map(NoAction::getName).collect(Collectors.joining(", "))
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers.size(); i++) {
-                                String header = headers.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                    case 3 -> {
-                                        richText.applyFont(0, 14, boldFont);
-                                        richText.applyFont(14, 16, redBoldFont);
-                                        richText.applyFont(17, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-                ),
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH QUYỀN THAO TÁC",
-                        "Danh sách quyền thao tác",
-                        headers1,
-                        null,
-                        widths1,
-                        permissionResponses,
-                        p -> List.of(
-                                p.getName(),
-                                p.getDescription(),
-                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers1.size(); i++) {
-                                String header = headers1.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-
-                )
-        );
+        List<UtilsExcel.ExcelSheetConfig<?>> sheets = buildRoleSheets(roleResponses);
         UtilsExcel.exportToExcel(
                 response,
                 sheets
@@ -333,134 +337,7 @@ public class RoleServiceImpl implements RoleService {
                 pageable
         );
         List<RoleResponse> roleResponses = getListRole(rolePage);
-        List<String> headers = List.of(
-                "Tên * \n(Tối đa 100 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)",
-                "Quyền thao tác * \n(Phải chọn ít nhất 1 quyền thao tác)"
-        );
-        Map<Integer, String[]> dropdowns = Map.of(
-                2, new String[]{"Hoạt động", "Không hoạt động"}
-        );
-        Map<Integer, Integer> widths = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000,
-                3, 12000
-        );
-        List<String> headers1 = List.of(
-                "Tên * \n(Tối đa 50 kí tự)",
-                "Mô tả \n(Tối đa 255 kí tự)",
-                "Trạng thái * \n(Hoạt động hoặc Không hoạt động)"
-        );
-        Map<Integer, Integer> widths1 = Map.of(
-                0, 8000,
-                1, 12000,
-                2, 10000
-        );
-        List<PermissionResponse> permissionResponses = permissionRepository.findAllStatus1()
-                .stream().map(p -> {
-                    PermissionResponse permissionResponse = new PermissionResponse();
-                    permissionResponse.setName(p.getName());
-                    permissionResponse.setDescription(p.getDescription());
-                    permissionResponse.setAction(p.getAction());
-                    return permissionResponse;
-                }).toList();
-        List<UtilsExcel.ExcelSheetConfig<?>> sheets = List.of(
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH VAI TRÒ",
-                        "Thông tin danh sách",
-                        headers,
-                        dropdowns,
-                        widths,
-                        roleResponses,
-                        p -> List.of(
-                                p.getName(),
-                                p.getDescription(),
-                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động",
-                                p.getPermissions().stream().map(NoAction::getName).collect(Collectors.joining(", "))
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers.size(); i++) {
-                                String header = headers.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                    case 3 -> {
-                                        richText.applyFont(0, 14, boldFont);
-                                        richText.applyFont(14, 16, redBoldFont);
-                                        richText.applyFont(17, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-                ),
-                new UtilsExcel.ExcelSheetConfig<>(
-                        "DANH SÁCH QUYỀN THAO TÁC",
-                        "Danh sách quyền thao tác",
-                        headers1,
-                        null,
-                        widths1,
-                        permissionResponses,
-                        p -> List.of(
-                                p.getName(),
-                                p.getDescription(),
-                                p.getAction() == 1 ? "Hoạt động" : "Không hoạt động"
-                        ),
-                        (workbook, cells) -> {
-                            Font boldFont = workbook.createFont();
-                            boldFont.setBold(true);
-                            Font redBoldFont = workbook.createFont();
-                            redBoldFont.setBold(true);
-                            redBoldFont.setColor(IndexedColors.RED.getIndex());
-                            Font italicFont = workbook.createFont();
-                            italicFont.setItalic(true);
-                            for (int i = 0; i < headers1.size(); i++) {
-                                String header = headers1.get(i);
-                                XSSFRichTextString richText = new XSSFRichTextString(header);
-                                switch (i) {
-                                    case 0 -> {
-                                        richText.applyFont(0, 4, boldFont);
-                                        richText.applyFont(4, 5, redBoldFont);
-                                        richText.applyFont(6, header.length(), italicFont);
-                                    }
-                                    case 1 -> {
-                                        richText.applyFont(0, 6, boldFont);
-                                        richText.applyFont(7, header.length(), italicFont);
-                                    }
-                                    case 2 -> {
-                                        richText.applyFont(0, 11, boldFont);
-                                        richText.applyFont(11, 13, redBoldFont);
-                                        richText.applyFont(14, header.length(), italicFont);
-                                    }
-                                }
-                                cells[i].setCellValue(richText);
-                            }
-                        }
-
-                )
-        );
+        List<UtilsExcel.ExcelSheetConfig<?>> sheets = buildRoleSheets(roleResponses);
         UtilsExcel.exportToExcel(
                 response,
                 sheets
@@ -499,12 +376,7 @@ public class RoleServiceImpl implements RoleService {
                 if (!violations.isEmpty()) {
                     throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
                 }
-                if (!excelNames.add(request.getName())){
-                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
-                }
-                if (existingNames.contains(request.getName())){
-                    throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
-                }
+                Utils.checkDuplicate(request.getName(), existingNames, excelNames);
                 Role role = new Role();
                 role.setName(request.getName());
                 role.setDescription(request.getDescription());
