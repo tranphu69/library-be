@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
@@ -24,6 +25,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByEmailAndIdNot(String email, String id);
     boolean existsByPhoneAndIdNot(String phone, String id);
     boolean existsByCodeAndIdNot(String code, String id);
+    Optional<User> findByUsername(String username);
 
     @Query("""
     SELECT u FROM User u

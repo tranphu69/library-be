@@ -1,0 +1,8 @@
+package com.example.library.service;
+
+import com.example.library.dto.request.LoginRequest;
+import com.example.library.dto.response.LoginResponse;
+
+public interface AuthService {
+    LoginResponse login(LoginRequest request);
+}

@@ -1,12 +1,10 @@
 package com.example.library.service;
 
-import com.example.library.dto.request.Role.RoleListRequest;
 import com.example.library.dto.request.User.UserAutoSearch;
 import com.example.library.dto.request.User.UserListRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.PageResponse;
-import com.example.library.dto.response.RoleResponse;
-import com.example.library.dto.response.UserResponse;
+import com.example.library.dto.response.User.UserResponse;
 import com.example.library.entity.User;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;

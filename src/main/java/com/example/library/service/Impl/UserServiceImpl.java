@@ -6,7 +6,7 @@ import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.NoAction;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.RoleResponse;
-import com.example.library.dto.response.UserResponse;
+import com.example.library.dto.response.User.UserResponse;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.enums.Position;
@@ -34,9 +34,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.library.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -64,6 +65,10 @@ public class UserServiceImpl implements UserService {
             1, 12000,
             2, 10000
     );
+
+    public UserServiceImpl(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     private List<UserResponse> getListUser(Page<User> userPage) {
         return userPage.getContent()
@@ -110,7 +115,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(!request.getFullName().isEmpty() ? request.getFullName().trim() : null);
         user.setCode(!request.getCode().isEmpty() ? request.getCode().trim() : null);
         user.setPhone(!request.getPhone().isEmpty() ? request.getPhone() : null);
@@ -232,7 +237,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(newUsername);
         user.setEmail(newEmail);
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName() != null ? request.getFullName().trim() : null);
         user.setCode(request.getCode() != null ? request.getCode().trim() : null);
         user.setPhone(newPhone);
@@ -687,7 +692,7 @@ public class UserServiceImpl implements UserService {
                 UserRequest request = new UserRequest();
                 request.setUsername(values.get(0));
                 request.setEmail(values.get(1));
-                request.setPassword(values.get(2));
+                request.setPassword(passwordEncoder.encode(values.get(2)));
                 request.setFullName(values.get(3));
                 request.setCode(values.get(4));
                 request.setPhone(Utils.getCellValue(row.getCell(5)));
