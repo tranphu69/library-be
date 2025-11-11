@@ -1,4 +1,4 @@
-package com.example.library.service;
+package com.example.library.service.OtherService;
 
 import com.example.library.entity.User;
 import com.example.library.exception.AppException;

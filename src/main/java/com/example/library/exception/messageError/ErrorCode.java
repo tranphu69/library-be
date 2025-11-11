@@ -17,6 +17,8 @@ public enum ErrorCode implements BaseErrorCode {
     AUTH_FORBIDDEN(2002, "Bạn không có quyền!", HttpStatus.FORBIDDEN),
     AUTH_TOKEN_EXPIRED(2003, "Mã thông báo truy cập đã hết hạn!", HttpStatus.UNAUTHORIZED),
     AUTH_ERROR_CODE(2004, "Thông tin đăng nhập không chính xác!",HttpStatus.BAD_REQUEST),
+    AUTH_CHECK_PASSWORD(2005, "Hai mật khẩu không trùng khớp!", HttpStatus.BAD_REQUEST),
+    AUTH_TOKEN_INVALID(2006, "Mã thông báo không hợp lệ", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

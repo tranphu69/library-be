@@ -1,28 +1,40 @@
 package com.example.library.service.Impl;
 
 import com.example.library.dto.request.LoginRequest;
+import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.LoginResponse;
 import com.example.library.dto.response.User.UserResponseListRole;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
+import com.example.library.entity.VerificationToken;
+import com.example.library.enums.AccountStatus;
+import com.example.library.enums.Position;
+import com.example.library.enums.TypeToken;
 import com.example.library.exception.AppException;
 import com.example.library.exception.messageError.ErrorCode;
+import com.example.library.exception.messageError.RoleErrorCode;
 import com.example.library.exception.messageError.UserErrorCode;
+import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
+import com.example.library.repository.VerificationTokenRepository;
 import com.example.library.security.JwtTokenProvider;
 import com.example.library.service.AuthService;
-import com.example.library.service.RefreshTokenService;
+import com.example.library.service.OtherService.EmailService;
+import com.example.library.service.OtherService.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+    private final PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -31,6 +43,16 @@ public class AuthServiceImpl implements AuthService {
     private RefreshTokenService refreshTokenService;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
+
+    public AuthServiceImpl(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -60,5 +82,91 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new AppException(ErrorCode.AUTH_ERROR_CODE);
         }
+    }
+
+    @Override
+    public void signUp(UserRequest request) {
+
+        String newUsername = request.getUsername().trim();
+        if (userRepository.existsByUsername(newUsername)) {
+            throw new AppException(UserErrorCode.USER_USERNAME_EXSITED);
+        }
+        String newEmail = request.getEmail().trim();
+        if (userRepository.existsByEmail(newEmail)) {
+            throw new AppException(UserErrorCode.USER_EMAIL_EXSITED);
+        }
+        String newPhone = request.getPhone();
+        if (newPhone != null && !newPhone.trim().isEmpty()) {
+            newPhone = newPhone.trim();
+            if (userRepository.existsByPhone(newPhone)) {
+                throw new AppException(UserErrorCode.USER_PHONE_EXSITED);
+            }
+        }
+        String newCode = request.getCode();
+        if (newCode != null && !newCode.trim().isEmpty()) {
+            newCode = newCode.trim();
+            if (userRepository.existsByCode(newCode)) {
+                throw new AppException(UserErrorCode.USER_CODE_EXSITED);
+            }
+        }
+        if (!Objects.equals(request.getPassword(), request.getPasswordConfirm())) {
+            throw new AppException(ErrorCode.AUTH_CHECK_PASSWORD);
+        }
+        Role roleUser = roleRepository.findByName("USER")
+                .orElseThrow(() -> new AppException(RoleErrorCode.ROLE_NO_EXSITED));
+        User user = new User();
+        user.setUsername(newUsername);
+        user.setEmail(newEmail);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(request.getFullName() != null ? request.getFullName().trim() : null);
+        user.setCode(request.getCode() != null ? request.getCode().trim() : null);
+        user.setPhone(newPhone);
+        user.setMajor(request.getMajor() != null ? request.getMajor().trim() : null);
+        user.setCourse(request.getCourse() != null ? request.getCourse().trim() : null);
+        user.setAvatarUrl(request.getAvatarUrl());
+        user.setPosition(Position.STUDENT);
+        user.setGender(request.getGender());
+        user.setDob(request.getDob());
+        user.setStatus(AccountStatus.VERIFICATION);
+        user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        user.setRoles(Set.of(roleUser));
+        userRepository.save(user);
+        sendEmailVerification(user);
+    }
+
+    @Override
+    public void verifyEmail(String token) {
+        Optional<VerificationToken> optionalToken = verificationTokenRepository
+                .findByTokenAndTypeToken(token, TypeToken.VERIFY_EMAIL);
+        if (optionalToken.isEmpty()) {
+            throw new AppException(ErrorCode.AUTH_TOKEN_INVALID);
+        }
+        VerificationToken verificationToken = optionalToken.get();
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        }
+        User user = verificationToken.getUser();
+        user.setStatus(AccountStatus.ACTIVE);
+        userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
+    }
+
+    public void sendEmailVerification(User user) {
+        verificationTokenRepository.deleteByUserAndTypeToken(user, TypeToken.VERIFY_EMAIL);
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+        verificationToken.setTypeToken(TypeToken.VERIFY_EMAIL);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+        verificationTokenRepository.save(verificationToken);
+        String verifyLink = "http://localhost:8080/api/v1/auth/verify?token=" + token;
+        emailService.sendSimpleEmail(
+                user.getEmail(),
+                "Xác thực tài khoản của bạn",
+                "Chào " + user.getUsername() + ",\n\n" +
+                        "Vui lòng bấm vào link sau để xác thực tài khoản:\n" + verifyLink + "\n\n" +
+                        "Link này sẽ hết hạn sau 24 giờ."
+        );
     }
 }

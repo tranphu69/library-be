@@ -1,4 +1,4 @@
-package com.example.library.service;
+package com.example.library.service.OtherService;
 
 import com.example.library.entity.RefreshToken;
 import com.example.library.repository.RefreshTokenRepository;

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -18,6 +19,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     boolean existsByNameAndIdNot(String name, Long id);
     boolean existsByPermissions_Id(Long permissionId);
     Set<Role> findByNameIn(List<String> names);
+    Optional<Role> findByName(String name);
 
     @Query("SELECT DISTINCT r FROM Role r JOIN r.permissions p WHERE p.id IN :permissionIds")
     List<Role> findAllByPermissionIds(@Param("permissionIds") List<Long> permissionIds);
