@@ -86,7 +86,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void signUp(UserRequest request) {
-
         String newUsername = request.getUsername().trim();
         if (userRepository.existsByUsername(newUsername)) {
             throw new AppException(UserErrorCode.USER_USERNAME_EXSITED);
@@ -149,6 +148,46 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(AccountStatus.ACTIVE);
         userRepository.save(user);
         verificationTokenRepository.delete(verificationToken);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        if (!newPassword.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$")) {
+            throw new AppException(UserErrorCode.USER_PASSWORD_CHARACTER);
+        }
+        VerificationToken resetToken = verificationTokenRepository
+                .findByTokenAndTypeToken(token, TypeToken.RESET_PASSWORD)
+                .orElseThrow(() -> new AppException(ErrorCode.AUTH_TOKEN_INVALID));
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        }
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        verificationTokenRepository.delete(resetToken);
+    }
+
+    @Override
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
+        verificationTokenRepository.deleteByUserAndTypeToken(user, TypeToken.RESET_PASSWORD);
+        String token = UUID.randomUUID().toString();
+        VerificationToken resetToken = new VerificationToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setTypeToken(TypeToken.RESET_PASSWORD);
+        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
+        verificationTokenRepository.save(resetToken);
+        String resetLink = "http://localhost:8080/api/v1/auth/reset-password?token=" + token;
+        emailService.sendSimpleEmail(
+                user.getEmail(),
+                "Đặt lại mật khẩu",
+                "Chào " + user.getUsername() + ",\n\n" +
+                        "Bấm vào link sau để đặt lại mật khẩu:\n" + resetLink + "\n\n" +
+                        "Link này sẽ hết hạn sau 1 giờ.\n" +
+                        "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này."
+        );
     }
 
     public void sendEmailVerification(User user) {

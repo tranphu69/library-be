@@ -43,4 +43,19 @@ public class AuthController {
         authService.verifyEmail(token);
         return ResponseEntity.ok("Xác thực thành công");
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        authService.forgotPassword(email);
+        return ResponseEntity.ok("Cần vào email để đặt lại mất khẩu!");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword
+    ) {
+        authService.resetPassword(token, newPassword);
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+    }
 }
