@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.dto.request.ChangePasswordRequest;
 import com.example.library.dto.request.LoginRequest;
 import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
@@ -16,4 +17,5 @@ public interface AuthService {
     LoginResponse refreshToken(RefreshTokenRequest request);
     User me (String username);
     void logout(String username);
+    void changePassword(ChangePasswordRequest request, String username);
 }

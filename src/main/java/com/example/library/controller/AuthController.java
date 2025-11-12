@@ -1,5 +1,6 @@
 package com.example.library.controller;
 
+import com.example.library.dto.request.ChangePasswordRequest;
 import com.example.library.dto.request.LoginRequest;
 import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
@@ -10,6 +11,7 @@ import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.service.AuthService;
 import com.example.library.service.UserService;
+import com.example.library.validation.OnCreate;
 import com.example.library.validation.OnSignUp;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,30 +68,46 @@ public class AuthController {
         return apiResponse;
     }
 
+    @PostMapping("/change-password")
+    public ApiResponse<String> changePassword(@Validated(OnCreate.class) @RequestBody ChangePasswordRequest request, Authentication authentication) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        authService.changePassword(request, authentication.getName());
+        apiResponse.setMessage("Bạn đã đổi mật khẩu thành công!");
+        return apiResponse;
+    }
+
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(Authentication authentication) {
+    public ApiResponse<String> logout(Authentication authentication) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
         authService.logout(authentication.getName());
-        return ResponseEntity.ok("Đăng xuất thành công!");
+        apiResponse.setMessage("Đăng xuất thành công!");
+        return apiResponse;
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+    public ApiResponse<String> verifyEmail(@RequestParam String token) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
         authService.verifyEmail(token);
-        return ResponseEntity.ok("Xác thực thành công");
+        apiResponse.setMessage("Xác thực thành công");
+        return apiResponse;
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+    public ApiResponse<String> forgotPassword(@RequestParam String email) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
         authService.forgotPassword(email);
-        return ResponseEntity.ok("Cần vào email để đặt lại mất khẩu!");
+        apiResponse.setMessage("Cần vào email để đặt lại mất khẩu!");
+        return apiResponse;
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(
+    public ApiResponse<String> resetPassword(
             @RequestParam String token,
             @RequestParam String newPassword
     ) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
         authService.resetPassword(token, newPassword);
-        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+        apiResponse.setMessage("Đặt lại mật khẩu thành công");
+        return apiResponse;
     }
 }

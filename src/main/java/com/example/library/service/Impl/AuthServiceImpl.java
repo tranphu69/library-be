@@ -1,5 +1,6 @@
 package com.example.library.service.Impl;
 
+import com.example.library.dto.request.ChangePasswordRequest;
 import com.example.library.dto.request.LoginRequest;
 import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
@@ -154,6 +155,24 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
         refreshTokenRepository.deleteByUserId(user.getId());
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
+        if (!request.getNewPassword().trim().equals(request.getConfirmPassword().trim())) {
+            throw new AppException(ErrorCode.AUTH_NOT_CHECK_PASSWORD);
+        }
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.AUTH_WRONG_PASSWORD);
+        }
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.AUTH_SAME_PASSWORD);
+        }
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
     }
 
     @Override
