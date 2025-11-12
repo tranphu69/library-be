@@ -10,10 +10,6 @@ public class LoginRequest {
     private String username;
     @NotBlank(message = "USER_PASSWORD_EMPTY")
     @Size(min = 10, max = 16, message = "USER_PASSWORD_EXCEED")
-    @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$",
-            message = "USER_PASSWORD_CHARACTER"
-    )
     private String password;
 
     public String getUsername() {

@@ -3,6 +3,7 @@ package com.example.library.service.Impl;
 import com.example.library.dto.request.LoginRequest;
 import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
+import com.example.library.dto.response.AuthMeResponse;
 import com.example.library.dto.response.LoginResponse;
 import com.example.library.dto.response.User.UserResponseListRole;
 import com.example.library.entity.RefreshToken;
@@ -24,6 +25,7 @@ import com.example.library.security.JwtTokenProvider;
 import com.example.library.service.AuthService;
 import com.example.library.service.OtherService.EmailService;
 import com.example.library.service.OtherService.RefreshTokenService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -109,6 +111,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public LoginResponse refreshToken(RefreshTokenRequest request) {
         RefreshToken token = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken())
                 .orElseThrow(() -> new AppException(ErrorCode.AUTH_TOKEN_INVALID));
@@ -140,6 +143,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public User me(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
+    }
+
+    @Override
+    @Transactional
+    public void logout(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
+        refreshTokenRepository.deleteByUserId(user.getId());
+    }
+
+    @Override
+    @Transactional
     public void signUp(UserRequest request) {
         String newUsername = request.getUsername().trim();
         if (userRepository.existsByUsername(newUsername)) {
@@ -189,6 +207,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void verifyEmail(String token) {
         Optional<VerificationToken> optionalToken = verificationTokenRepository
                 .findByTokenAndTypeToken(token, TypeToken.VERIFY_EMAIL);
@@ -206,6 +225,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void resetPassword(String token, String newPassword) {
         if (!newPassword.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$")) {
             throw new AppException(UserErrorCode.USER_PASSWORD_CHARACTER);
@@ -223,6 +243,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));

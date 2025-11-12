@@ -4,15 +4,21 @@ import com.example.library.dto.request.LoginRequest;
 import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.ApiResponse;
+import com.example.library.dto.response.AuthMeResponse;
 import com.example.library.dto.response.LoginResponse;
+import com.example.library.entity.Role;
+import com.example.library.entity.User;
 import com.example.library.service.AuthService;
 import com.example.library.service.UserService;
 import com.example.library.validation.OnSignUp;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -44,6 +50,26 @@ public class AuthController {
         authService.signUp(request);
         apiResponse.setMessage("Cần vào email để kích hoạt tài khoản này!");
         return apiResponse;
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<AuthMeResponse> me(Authentication authentication) {
+        ApiResponse<AuthMeResponse> apiResponse = new ApiResponse<>();
+        User user = authService.me(authentication.getName());
+        List<String> roleNames = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .toList();
+        AuthMeResponse authMeResponse = modelMapper.map(user, AuthMeResponse.class);
+        authMeResponse.setRoles(roleNames);
+        apiResponse.setResult(authMeResponse);
+        return apiResponse;
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(Authentication authentication) {
+        authService.logout(authentication.getName());
+        return ResponseEntity.ok("Đăng xuất thành công!");
     }
 
     @GetMapping("/verify")
