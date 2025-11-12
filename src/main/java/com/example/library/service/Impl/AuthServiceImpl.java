@@ -1,9 +1,11 @@
 package com.example.library.service.Impl;
 
 import com.example.library.dto.request.LoginRequest;
+import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.LoginResponse;
 import com.example.library.dto.response.User.UserResponseListRole;
+import com.example.library.entity.RefreshToken;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.entity.VerificationToken;
@@ -14,6 +16,7 @@ import com.example.library.exception.AppException;
 import com.example.library.exception.messageError.ErrorCode;
 import com.example.library.exception.messageError.RoleErrorCode;
 import com.example.library.exception.messageError.UserErrorCode;
+import com.example.library.repository.RefreshTokenRepository;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.repository.VerificationTokenRepository;
@@ -49,6 +52,27 @@ public class AuthServiceImpl implements AuthService {
     private EmailService emailService;
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    private void sendEmailVerification(User user) {
+        verificationTokenRepository.deleteByUserAndTypeToken(user, TypeToken.VERIFY_EMAIL);
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+        verificationToken.setTypeToken(TypeToken.VERIFY_EMAIL);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+        verificationTokenRepository.save(verificationToken);
+        String verifyLink = "http://localhost:8080/api/v1/auth/verify?token=" + token;
+        emailService.sendSimpleEmail(
+                user.getEmail(),
+                "Xác thực tài khoản của bạn",
+                "Chào " + user.getUsername() + ",\n\n" +
+                        "Vui lòng bấm vào link sau để xác thực tài khoản:\n" + verifyLink + "\n\n" +
+                        "Link này sẽ hết hạn sau 24 giờ."
+        );
+    }
 
     public AuthServiceImpl(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
@@ -67,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
                     .map(Role::getName)
                     .toList();
             String accessToken = jwtTokenProvider.generateAccessToken(request.getUsername(), nameRole);
-            String refreshToken = "";
+            String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
             UserResponseListRole profile = new UserResponseListRole();
             profile.setUsername(user.getUsername());
             profile.setId(user.getId());
@@ -82,6 +106,37 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new AppException(ErrorCode.AUTH_ERROR_CODE);
         }
+    }
+
+    @Override
+    public LoginResponse refreshToken(RefreshTokenRequest request) {
+        RefreshToken token = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken())
+                .orElseThrow(() -> new AppException(ErrorCode.AUTH_TOKEN_INVALID));
+        if(refreshTokenService.isTokenExpired(token)) {
+            refreshTokenRepository.deleteByToken(request.getRefreshToken());
+            throw new AppException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        }
+        List<String> roleNames = token.getUser().getRoles()
+                .stream()
+                .map(Role::getName)
+                .toList();
+        String accessToken = jwtTokenProvider.generateAccessToken(token.getUser().getUsername(), roleNames);
+        String newRefreshToken = null;
+        if(refreshTokenService.isTokenExpiringSoon(token, 3)) {
+            newRefreshToken = refreshTokenService.createRefreshToken(token.getUser()).getToken();
+            refreshTokenRepository.deleteByToken(request.getRefreshToken());
+        }
+        UserResponseListRole profile = new UserResponseListRole();
+        profile.setUsername(token.getUser().getUsername());
+        profile.setId(token.getUser().getId());
+        profile.setEmail(token.getUser().getEmail());
+        profile.setRoles(roleNames);
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setAccessToken(accessToken);
+        loginResponse.setRefreshToken(newRefreshToken != null ? newRefreshToken : request.getRefreshToken());
+        loginResponse.setTokenType("Bearer");
+        loginResponse.setUser(profile);
+        return loginResponse;
     }
 
     @Override
@@ -187,25 +242,6 @@ public class AuthServiceImpl implements AuthService {
                         "Bấm vào link sau để đặt lại mật khẩu:\n" + resetLink + "\n\n" +
                         "Link này sẽ hết hạn sau 1 giờ.\n" +
                         "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này."
-        );
-    }
-
-    public void sendEmailVerification(User user) {
-        verificationTokenRepository.deleteByUserAndTypeToken(user, TypeToken.VERIFY_EMAIL);
-        String token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = new VerificationToken();
-        verificationToken.setToken(token);
-        verificationToken.setUser(user);
-        verificationToken.setTypeToken(TypeToken.VERIFY_EMAIL);
-        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24));
-        verificationTokenRepository.save(verificationToken);
-        String verifyLink = "http://localhost:8080/api/v1/auth/verify?token=" + token;
-        emailService.sendSimpleEmail(
-                user.getEmail(),
-                "Xác thực tài khoản của bạn",
-                "Chào " + user.getUsername() + ",\n\n" +
-                        "Vui lòng bấm vào link sau để xác thực tài khoản:\n" + verifyLink + "\n\n" +
-                        "Link này sẽ hết hạn sau 24 giờ."
         );
     }
 }

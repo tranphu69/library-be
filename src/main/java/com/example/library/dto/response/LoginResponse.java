@@ -1,6 +1,5 @@
 package com.example.library.dto.response;
 
-import com.example.library.dto.response.User.UserResponse;
 import com.example.library.dto.response.User.UserResponseListRole;
 
 public class LoginResponse {

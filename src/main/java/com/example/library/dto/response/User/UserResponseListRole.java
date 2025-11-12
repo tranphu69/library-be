@@ -2,7 +2,6 @@ package com.example.library.dto.response.User;
 
 import java.util.List;
 
-
 public class UserResponseListRole {
     private String id;
     private String username;

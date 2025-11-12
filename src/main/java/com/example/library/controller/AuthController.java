@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.dto.request.LoginRequest;
+import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.LoginResponse;
@@ -27,6 +28,13 @@ public class AuthController {
     public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         ApiResponse<LoginResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(authService.login(request));
+        return apiResponse;
+    }
+
+    @PostMapping("/refresh-token")
+    public ApiResponse<LoginResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        ApiResponse<LoginResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(authService.refreshToken(request));
         return apiResponse;
     }
 
