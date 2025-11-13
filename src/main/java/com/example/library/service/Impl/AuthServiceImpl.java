@@ -7,10 +7,7 @@ import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.AuthMeResponse;
 import com.example.library.dto.response.LoginResponse;
 import com.example.library.dto.response.User.UserResponseListRole;
-import com.example.library.entity.RefreshToken;
-import com.example.library.entity.Role;
-import com.example.library.entity.User;
-import com.example.library.entity.VerificationToken;
+import com.example.library.entity.*;
 import com.example.library.enums.AccountStatus;
 import com.example.library.enums.Position;
 import com.example.library.enums.TypeToken;
@@ -91,7 +88,11 @@ public class AuthServiceImpl implements AuthService {
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new AppException(UserErrorCode.USER_USERNAME_EXSITED));
             List<String> nameRole = user.getRoles().stream()
-                    .map(Role::getName)
+                    .map(role -> "ROLE_" + role.getName())
+                    .toList();
+            List<String> namePermission = user.getRoles().stream()
+                    .flatMap(role -> role.getPermissions().stream())
+                    .map(Permission::getName)
                     .toList();
             String accessToken = jwtTokenProvider.generateAccessToken(request.getUsername(), nameRole);
             String refreshToken = refreshTokenService.createRefreshToken(user).getToken();
@@ -100,6 +101,7 @@ public class AuthServiceImpl implements AuthService {
             profile.setId(user.getId());
             profile.setEmail(user.getEmail());
             profile.setRoles(nameRole);
+            profile.setPermissions(namePermission);
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setAccessToken(accessToken);
             loginResponse.setRefreshToken(refreshToken);
@@ -122,7 +124,11 @@ public class AuthServiceImpl implements AuthService {
         }
         List<String> roleNames = token.getUser().getRoles()
                 .stream()
-                .map(Role::getName)
+                .map(role -> "ROLE_" + role.getName())
+                .toList();
+        List<String> namePermission = token.getUser().getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(Permission::getName)
                 .toList();
         String accessToken = jwtTokenProvider.generateAccessToken(token.getUser().getUsername(), roleNames);
         String newRefreshToken = null;
@@ -135,6 +141,7 @@ public class AuthServiceImpl implements AuthService {
         profile.setId(token.getUser().getId());
         profile.setEmail(token.getUser().getEmail());
         profile.setRoles(roleNames);
+        profile.setPermissions(namePermission);
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setAccessToken(accessToken);
         loginResponse.setRefreshToken(newRefreshToken != null ? newRefreshToken : request.getRefreshToken());

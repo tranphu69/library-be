@@ -692,7 +692,7 @@ public class UserServiceImpl implements UserService {
                 UserRequest request = new UserRequest();
                 request.setUsername(values.get(0));
                 request.setEmail(values.get(1));
-                request.setPassword(passwordEncoder.encode(values.get(2)));
+                request.setPassword(values.get(2).trim());
                 request.setFullName(values.get(3));
                 request.setCode(values.get(4));
                 request.setPhone(Utils.getCellValue(row.getCell(5)));
