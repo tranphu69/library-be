@@ -34,6 +34,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -204,6 +205,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public User create(UserRequest request) {
         String newUsername = request.getUsername().trim();
         if (userRepository.existsByUsername(newUsername)) {
@@ -255,6 +257,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     public User update(UserRequest request, String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
@@ -306,6 +309,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public void delete(List<String> id) {
         List<User> users = userRepository.findAllById(id);
         List<String> deleteIds = users.stream()
@@ -322,6 +326,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public User detail(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(UserErrorCode.USER_NO_EXSITED));
@@ -332,6 +337,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public PageResponse<UserResponse> getList(UserListRequest request) {
         List<Long> roleIds = Arrays.stream(request.getRoles().split(","))
                 .map(String::trim)
@@ -367,6 +373,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         List<UserResponse> userResponses = new ArrayList<>();
         List<String> headers = List.of(
@@ -508,6 +515,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public void exportToExcel(UserListRequest request, HttpServletResponse response) throws IOException {
         List<Long> roleIds = Arrays.stream(request.getRoles().split(","))
                 .map(String::trim)
@@ -665,6 +673,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream()) {
             Workbook workbook = new XSSFWorkbook(is);
@@ -744,6 +753,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('USER_SEARCH')")
     public List autoSearch(UserAutoSearch keyword) {
         if (keyword.getKeyword() == null || keyword.getKeyword().trim().isEmpty() || keyword.getType() == null || keyword.getType().trim().isEmpty()) {
             return Collections.emptyList();

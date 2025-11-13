@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -121,6 +122,7 @@ public class PermissionSericeImpl implements PermissionService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('PERMISSION_CREATE')")
     public Permission create(PermissionRequest request) {
         String newName = request.getName().trim();
         if (permissionRepository.existsByName(newName)) {
@@ -135,6 +137,7 @@ public class PermissionSericeImpl implements PermissionService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('PERMISSION_UPDATE')")
     public Permission update(PermissionRequest request, Long id) {
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new AppException(PermissionErrorCode.PERMISSION_NO_EXSITED));
@@ -158,6 +161,7 @@ public class PermissionSericeImpl implements PermissionService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('PERMISSION_DELETE')")
     public void delete(List<Long> ids) {
         List<Permission> permissions = permissionRepository.findAllById(ids);
         List<Long> deletedIds = permissions.stream()
@@ -178,6 +182,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('PERMISSION_SEARCH')")
     public Permission detail(Long id) {
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new AppException(PermissionErrorCode.PERMISSION_NO_EXSITED));
@@ -188,6 +193,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('PERMISSION_SEARCH')")
     public PageResponse<PermissionResponse> getList(PermissionListRequest request) {
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
@@ -207,6 +213,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('PERMISSION_SEARCH')")
     public void exportTemplateExcel(HttpServletResponse response) throws IOException {
         List<PermissionResponse> permissionResponses = new ArrayList<>();
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = buildPermissionSheets(permissionResponses);
@@ -217,6 +224,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('PERMISSION_SEARCH')")
     public void exportToExcel(PermissionListRequest request, HttpServletResponse response) throws IOException {
         Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
@@ -235,6 +243,7 @@ public class PermissionSericeImpl implements PermissionService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAuthority('PERMISSION_CREATE')")
     public void importFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream()) {
             Workbook workbook = new XSSFWorkbook(is);
@@ -270,6 +279,7 @@ public class PermissionSericeImpl implements PermissionService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('PERMISSION_SEARCH')")
     public List<String> autoSearch(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return Collections.emptyList();
