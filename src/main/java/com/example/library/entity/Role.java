@@ -27,9 +27,9 @@ public class Role {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     @Column(name = "created_by")
-    private Long createdBy;
+    private String createdBy;
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private String updatedBy;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permissions",
@@ -41,7 +41,7 @@ public class Role {
     public Role() {
     }
 
-    public Role(Long id, String name, String description, Integer action, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Set<Permission> permissions) {
+    public Role(Long id, String name, String description, Integer action, LocalDateTime createdAt, LocalDateTime updatedAt, String createdBy, String updatedBy, Set<Permission> permissions) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -109,19 +109,19 @@ public class Role {
         this.updatedAt = updatedAt;
     }
 
-    public Long getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public Long getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(Long updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 }

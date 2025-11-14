@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -218,11 +219,15 @@ public class RoleServiceImpl implements RoleService {
                 throw new AppException(PermissionErrorCode.PERMISSION_NO_EXSITED);
             }
         }
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         Role role = new Role();
         role.setName(newName);
         role.setDescription(request.getDescription());
         role.setAction(request.getAction());
         role.setPermissions(new HashSet<>(permissions));
+        role.setCreatedBy(currentUsername);
         return roleRepository.save(role);
     }
 
@@ -255,9 +260,13 @@ public class RoleServiceImpl implements RoleService {
         ) {
             return role;
         }
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         role.setName(newName);
         role.setDescription(request.getDescription());
         role.setAction(request.getAction());
+        role.setUpdatedBy(currentUsername);
         role.setPermissions(new HashSet<>(permissions));
         return roleRepository.save(role);
     }
@@ -386,10 +395,14 @@ public class RoleServiceImpl implements RoleService {
                     throw new AppException(RoleErrorCode.ROLE_ERROR_FILE);
                 }
                 Utils.checkDuplicate(request.getName(), existingNames, excelNames);
+                String currentUsername = SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getName();
                 Role role = new Role();
                 role.setName(request.getName());
                 role.setDescription(request.getDescription());
                 role.setAction(request.getAction());
+                role.setCreatedBy(currentUsername);
                 role.setPermissions(new HashSet<>(permissions));
                 roles.add(role);
             }

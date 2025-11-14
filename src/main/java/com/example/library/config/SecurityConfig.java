@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/me",
-                                "/api/v1/auth//change-password"
+                                "/api/v1/auth/change-password"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )

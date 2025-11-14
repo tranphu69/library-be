@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -128,10 +129,14 @@ public class PermissionSericeImpl implements PermissionService {
         if (permissionRepository.existsByName(newName)) {
             throw new AppException(PermissionErrorCode.PERMISSION_EXSITED);
         }
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         Permission permission = new Permission();
         permission.setName(newName);
         permission.setDescription(request.getDescription());
         permission.setAction(request.getAction());
+        permission.setCreatedBy(currentUsername);
         return permissionRepository.save(permission);
     }
 
@@ -153,9 +158,13 @@ public class PermissionSericeImpl implements PermissionService {
         if (isUsed && request.getAction() == 0) {
             throw new AppException(PermissionErrorCode.PERMISSION_IN_USE_BY_ROLE);
         }
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         permission.setName(newName);
         permission.setDescription(request.getDescription());
         permission.setAction(request.getAction());
+        permission.setUpdatedBy(currentUsername);
         return permissionRepository.save(permission);
     }
 
@@ -265,10 +274,14 @@ public class PermissionSericeImpl implements PermissionService {
                     throw new AppException(PermissionErrorCode.PERMISSION_ERROR_FILE);
                 }
                 Utils.checkDuplicate(request.getName(), existingNames, excelNames);
+                String currentUsername = SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getName();
                 Permission permission = new Permission();
                 permission.setName(request.getName());
                 permission.setDescription(request.getDescription());
                 permission.setAction(request.getAction());
+                permission.setCreatedBy(currentUsername);
                 permissions.add(permission);
             }
             permissionRepository.saveAll(permissions);

@@ -25,8 +25,8 @@ public class UserResponse {
     private AccountStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long createdBy;
-    private Long updatedBy;
+    private String createdBy;
+    private String updatedBy;
     private LocalDateTime lastLoginAt;
     private Integer failedLoginAttempts;
     private LocalDateTime lockedUntil;
@@ -153,19 +153,19 @@ public class UserResponse {
         this.updatedAt = updatedAt;
     }
 
-    public Long getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public Long getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(Long updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 

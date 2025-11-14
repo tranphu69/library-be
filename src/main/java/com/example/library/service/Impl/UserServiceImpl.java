@@ -35,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -113,6 +114,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private User getUser(UserRequest request, Set<Role> roles) {
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -128,6 +132,7 @@ public class UserServiceImpl implements UserService {
         user.setDob(request.getDob());
         user.setStatus(request.getStatus());
         user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        user.setCreatedBy(currentUsername);
         user.setRoles(new HashSet<>(roles));
         return user;
     }
@@ -236,6 +241,9 @@ public class UserServiceImpl implements UserService {
                 throw new AppException(RoleErrorCode.ROLE_NO_EXSITED);
             }
         }
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         User user = new User();
         user.setUsername(newUsername);
         user.setEmail(newEmail);
@@ -251,6 +259,7 @@ public class UserServiceImpl implements UserService {
         user.setDob(request.getDob());
         user.setStatus(request.getStatus());
         user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        user.setCreatedBy(currentUsername);
         user.setRoles(new HashSet<>(roles));
         return userRepository.save(user);
     }
@@ -290,6 +299,9 @@ public class UserServiceImpl implements UserService {
                 throw new AppException(RoleErrorCode.ROLE_NO_EXSITED);
             }
         }
+        String currentUsername = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
         user.setUsername(newUsername);
         user.setEmail(newEmail);
         user.setFullName(request.getFullName() != null ? request.getFullName().trim() : null);
@@ -303,6 +315,7 @@ public class UserServiceImpl implements UserService {
         user.setDob(request.getDob());
         user.setStatus(request.getStatus());
         user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        user.setUpdatedBy(currentUsername);
         user.setRoles(new HashSet<>(roles));
         return userRepository.save(user);
     }
