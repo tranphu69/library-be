@@ -66,7 +66,7 @@ public class UserController {
         return apiResponse;
     }
 
-    @GetMapping
+    @PostMapping("/list")
     public ApiResponse<PageResponse<UserResponse>> getList(@Valid @RequestBody UserListRequest request) {
         PageResponse<UserResponse> response = userService.getList(request);
         ApiResponse<PageResponse<UserResponse>> apiResponse = new ApiResponse<>();
