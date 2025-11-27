@@ -11,13 +11,13 @@ public class RoleResponse {
     private Set<NoAction> permissions;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long createdBy;
-    private Long updatedBy;
+    private String createdBy;
+    private String updatedBy;
 
     public RoleResponse() {
     }
 
-    public RoleResponse(Long id, String name, String description, Integer action, Set<NoAction> permissions, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy) {
+    public RoleResponse(Long id, String name, String description, Integer action, Set<NoAction> permissions, LocalDateTime createdAt, LocalDateTime updatedAt, String createdBy, String updatedBy) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -85,19 +85,19 @@ public class RoleResponse {
         this.updatedAt = updatedAt;
     }
 
-    public Long getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    public Long getUpdatedBy() {
+    public String getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(Long updatedBy) {
+    public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
 }

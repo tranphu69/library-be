@@ -1,4 +1,4 @@
-package com.example.library.service.Impl;
+package com.example.library.dto.service.Impl;
 
 import com.example.library.dto.request.User.UserAutoSearch;
 import com.example.library.dto.request.User.UserListRequest;
@@ -7,6 +7,7 @@ import com.example.library.dto.response.NoAction;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.RoleResponse;
 import com.example.library.dto.response.User.UserResponse;
+import com.example.library.dto.service.UserService;
 import com.example.library.entity.Role;
 import com.example.library.entity.User;
 import com.example.library.enums.Position;
@@ -17,7 +18,6 @@ import com.example.library.exception.messageError.RoleErrorCode;
 import com.example.library.exception.messageError.UserErrorCode;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
-import com.example.library.service.UserService;
 import com.example.library.utils.Utils;
 import com.example.library.utils.UtilsExcel;
 import jakarta.persistence.EntityManager;

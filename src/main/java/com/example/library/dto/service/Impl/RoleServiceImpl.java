@@ -1,4 +1,4 @@
-package com.example.library.service.Impl;
+package com.example.library.dto.service.Impl;
 
 import com.example.library.dto.request.Role.RoleListRequest;
 import com.example.library.dto.request.Role.RoleRequest;
@@ -6,6 +6,7 @@ import com.example.library.dto.response.NoAction;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.PermissionResponse;
 import com.example.library.dto.response.RoleResponse;
+import com.example.library.dto.service.RoleService;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
@@ -13,7 +14,6 @@ import com.example.library.exception.messageError.PermissionErrorCode;
 import com.example.library.exception.messageError.RoleErrorCode;
 import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
-import com.example.library.service.RoleService;
 import com.example.library.utils.Utils;
 import com.example.library.utils.UtilsExcel;
 import jakarta.servlet.http.HttpServletResponse;
@@ -199,6 +199,8 @@ public class RoleServiceImpl implements RoleService {
                     response.setPermissions(noActionSet);
                     response.setCreatedAt(role.getCreatedAt());
                     response.setUpdatedAt(role.getUpdatedAt());
+                    response.setCreatedBy(role.getCreatedBy());
+                    response.setUpdatedBy(role.getUpdatedBy());
                     return response;
                 })
                 .collect(Collectors.toList());

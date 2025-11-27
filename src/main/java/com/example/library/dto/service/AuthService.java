@@ -1,4 +1,4 @@
-package com.example.library.service;
+package com.example.library.dto.service;
 
 import com.example.library.dto.request.ChangePasswordRequest;
 import com.example.library.dto.request.LoginRequest;

@@ -108,7 +108,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> handleUncategorized(Exception ex) {
-        return buildResponse(ErrorCode.UNCATEGORIZED_EXCEPTION);
+    public ResponseEntity<?> handleUncategorized(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
     }
 }

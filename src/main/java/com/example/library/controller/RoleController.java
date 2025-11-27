@@ -6,7 +6,7 @@ import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.RoleResponse;
 import com.example.library.entity.Role;
-import com.example.library.service.RoleService;
+import com.example.library.dto.service.RoleService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
