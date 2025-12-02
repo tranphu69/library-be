@@ -1,4 +1,4 @@
-package com.example.library.dto.service.OtherService;
+package com.example.library.service.OtherService;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

@@ -1,4 +1,4 @@
-package com.example.library.dto.service;
+package com.example.library.service;
 
 import com.example.library.dto.request.Permission.PermissionListRequest;
 import com.example.library.dto.request.Permission.PermissionRequest;

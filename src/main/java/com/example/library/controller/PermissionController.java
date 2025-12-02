@@ -6,7 +6,7 @@ import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.PermissionResponse;
 import com.example.library.entity.Permission;
-import com.example.library.dto.service.PermissionService;
+import com.example.library.service.PermissionService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;

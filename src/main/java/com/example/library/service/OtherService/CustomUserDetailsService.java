@@ -1,4 +1,4 @@
-package com.example.library.dto.service.OtherService;
+package com.example.library.service.OtherService;
 
 import com.example.library.entity.Role;
 import com.example.library.entity.User;

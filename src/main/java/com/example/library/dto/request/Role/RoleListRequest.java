@@ -16,9 +16,18 @@ public class RoleListRequest {
     private Integer page;
     @Min(value = 1, message = "ROLE_VALUE")
     private Integer size;
+    private String ids;
     private String sortBy;
     @Pattern(regexp = "^(ASC|DESC)$", message = "ROLE_VALUE")
     private String sortType;
+
+    public String getIds() {
+        return ids;
+    }
+
+    public void setIds(String ids) {
+        this.ids = ids;
+    }
 
     public String getPermissions() {
         return permissions;

@@ -3,6 +3,7 @@ package com.example.library.repository;
 import com.example.library.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,6 +24,9 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query("SELECT DISTINCT r FROM Role r JOIN r.permissions p WHERE p.id IN :permissionIds")
     List<Role> findAllByPermissionIds(@Param("permissionIds") List<Long> permissionIds);
+
+    @Query("SELECT r FROM Role r WHERE r.id IN :ids")
+    List<Role> findAllByIdsWithSort(@Param("ids") List<Long> ids, Sort sort);
 
     @Query("""
     SELECT r FROM Role r

@@ -1,4 +1,4 @@
-package com.example.library.dto.service.Impl;
+package com.example.library.service.Impl;
 
 import com.example.library.dto.request.Permission.PermissionListRequest;
 import com.example.library.dto.request.Permission.PermissionRequest;
@@ -10,7 +10,7 @@ import com.example.library.exception.AppException;
 import com.example.library.exception.messageError.PermissionErrorCode;
 import com.example.library.repository.PermissionRepository;
 import com.example.library.repository.RoleRepository;
-import com.example.library.dto.service.PermissionService;
+import com.example.library.service.PermissionService;
 import com.example.library.utils.Utils;
 import com.example.library.utils.UtilsExcel;
 import jakarta.servlet.http.HttpServletResponse;

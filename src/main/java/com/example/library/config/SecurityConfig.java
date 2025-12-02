@@ -1,7 +1,7 @@
 package com.example.library.config;
 
 import com.example.library.security.JwtAuthenticationFilter;
-import com.example.library.dto.service.OtherService.CustomUserDetailsService;
+import com.example.library.service.OtherService.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

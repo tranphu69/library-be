@@ -7,7 +7,7 @@ import com.example.library.dto.response.ApiResponse;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.User.UserResponse;
 import com.example.library.entity.User;
-import com.example.library.dto.service.UserService;
+import com.example.library.service.UserService;
 import com.example.library.validation.OnCreate;
 import com.example.library.validation.OnUpdate;
 import jakarta.servlet.http.HttpServletResponse;

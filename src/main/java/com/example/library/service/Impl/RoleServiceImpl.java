@@ -1,4 +1,4 @@
-package com.example.library.dto.service.Impl;
+package com.example.library.service.Impl;
 
 import com.example.library.dto.request.Role.RoleListRequest;
 import com.example.library.dto.request.Role.RoleRequest;
@@ -6,7 +6,7 @@ import com.example.library.dto.response.NoAction;
 import com.example.library.dto.response.PageResponse;
 import com.example.library.dto.response.PermissionResponse;
 import com.example.library.dto.response.RoleResponse;
-import com.example.library.dto.service.RoleService;
+import com.example.library.service.RoleService;
 import com.example.library.entity.Permission;
 import com.example.library.entity.Role;
 import com.example.library.exception.AppException;
@@ -23,6 +23,7 @@ import jakarta.validation.Validator;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +45,8 @@ public class RoleServiceImpl implements RoleService {
     private RoleRepository roleRepository;
     @Autowired
     private Validator validator;
+    @Autowired
+    private ModelMapper modelMapper;
     @Autowired
     private PermissionRepository permissionRepository;
     private final List<String> headers = List.of(
@@ -342,25 +345,35 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @PreAuthorize("hasAuthority('ROLE_SEARCH')")
     public void exportToExcel(RoleListRequest request, HttpServletResponse response) throws IOException {
-        List<Long> permissionIds = Arrays.stream(request.getPermissions().split(","))
+        List<Long> ids = Arrays.stream(request.getIds().split(","))
                 .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
-        Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
-        Page<Role> rolePage = roleRepository.findRolesWithAllPermissions(
-                request.getName(),
-                request.getAction(),
-                permissionIds,
-                pageable
-        );
-        List<RoleResponse> roleResponses = getListRole(rolePage);
+                .map(Long::parseLong)
+                .toList();
+        List<RoleResponse> roleResponses;
+        if (!ids.isEmpty()) {
+            Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
+            List<Role> roles = roleRepository.findAllByIdsWithSort(ids, sort);
+            roleResponses = roles.stream()
+                    .map(role -> modelMapper.map(role, RoleResponse.class))
+                    .collect(Collectors.toList());
+        } else {
+            List<Long> permissionIds = Arrays.stream(request.getPermissions().split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            Sort sort = Utils.createSort(request.getSortBy(), request.getSortType(), List.of("name", "action", "createdAt", "updatedAt", "createdBy", "updatedBy"),"createdAt");
+            Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),sort);
+            Page<Role> rolePage = roleRepository.findRolesWithAllPermissions(
+                    request.getName(),
+                    request.getAction(),
+                    permissionIds,
+                    pageable
+            );
+            roleResponses = getListRole(rolePage);
+        }
         List<UtilsExcel.ExcelSheetConfig<?>> sheets = buildRoleSheets(roleResponses);
-        UtilsExcel.exportToExcel(
-                response,
-                sheets
-        );
+        UtilsExcel.exportToExcel(response, sheets);
     }
 
     @Override

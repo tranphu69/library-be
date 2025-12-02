@@ -1,4 +1,4 @@
-package com.example.library.dto.service.Impl;
+package com.example.library.service.Impl;
 
 import com.example.library.dto.request.ChangePasswordRequest;
 import com.example.library.dto.request.LoginRequest;
@@ -6,7 +6,7 @@ import com.example.library.dto.request.RefreshTokenRequest;
 import com.example.library.dto.request.User.UserRequest;
 import com.example.library.dto.response.LoginResponse;
 import com.example.library.dto.response.User.UserResponseListRole;
-import com.example.library.dto.service.OtherService.EmailService;
+import com.example.library.service.OtherService.EmailService;
 import com.example.library.entity.*;
 import com.example.library.enums.AccountStatus;
 import com.example.library.enums.Position;
@@ -20,8 +20,8 @@ import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.repository.VerificationTokenRepository;
 import com.example.library.security.JwtTokenProvider;
-import com.example.library.dto.service.AuthService;
-import com.example.library.dto.service.OtherService.RefreshTokenService;
+import com.example.library.service.AuthService;
+import com.example.library.service.OtherService.RefreshTokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
