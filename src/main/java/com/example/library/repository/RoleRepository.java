@@ -49,7 +49,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT r.name FROM Role r WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @Query("SELECT r.name FROM Role r WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%')) AND r.action <> -1")
     List<String> findNamesByKeyword(@Param("keyword") String keyword);
 
     @Query("SELECT r.name FROM Role r WHERE r.action <> -1")
